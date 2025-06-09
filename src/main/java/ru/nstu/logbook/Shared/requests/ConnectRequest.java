@@ -1,0 +1,6 @@
+package ru.nstu.logbook.Shared.requests;
+
+import java.io.Serializable;
+
+public record ConnectRequest(String name) implements Serializable {
+}

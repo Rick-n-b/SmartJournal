@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<SplitPane dividerPositions="0.3" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nstu.logbook.Client.controllers.PlansController">
+  <items>
+    <AnchorPane fx:id="menuPane" maxWidth="200.0" minHeight="0.0" minWidth="200.0" prefHeight="600.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
+         <children>
+            <Label fx:id="authorizedName" layoutX="14.0" layoutY="14.0" text="Unreg">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Button fx:id="authorizationButton" layoutX="109.0" layoutY="50.0" mnemonicParsing="false" onAction="#authShow" text="Authorize">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="registrationButton" layoutX="13.0" layoutY="50.0" mnemonicParsing="false" onAction="#registrationShow" text="Registrate">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="plansButton" layoutX="58.0" layoutY="105.0" mnemonicParsing="false" onAction="#plansShow" text="Big plans">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Label layoutX="13.0" layoutY="261.0" text="Helpful reminds:">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <DatePicker fx:id="dateScroll" layoutX="13.0" layoutY="185.0" />
+            <Label layoutX="13.0" layoutY="153.0" text="View tasks as scroll since:">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Button fx:id="scrollAdmitButton" layoutX="70.0" layoutY="220.0" mnemonicParsing="false" onAction="#scrollShow" text="Accept">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" onMouseClicked="#remindsListEvent" prefHeight="249.0" prefWidth="174.0" />
+            <Button fx:id="backButton" layoutX="14.0" layoutY="556.0" mnemonicParsing="false" onAction="#back" text="Back">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+         </children></AnchorPane>
+      <ScrollPane minWidth="600.0" prefHeight="200.0" prefWidth="200.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="691.0" prefHeight="592.0" prefWidth="691.0">
+               <children>
+                  <TextArea layoutY="-4.0" prefHeight="600.0" prefWidth="692.0" />
+               </children>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
+  </items>
+</SplitPane>

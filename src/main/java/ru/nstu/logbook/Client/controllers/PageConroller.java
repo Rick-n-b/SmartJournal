@@ -28,32 +28,31 @@ import java.util.ResourceBundle;
 public class PageConroller {
 
     @FXML
-    private Button authorizationButton;
+    public Button authorizationButton;
 
     @FXML
-    private Label authorizedName;
-
-
-    @FXML
-    private DatePicker dateScroll;
+    public Label authorizedName;
 
     @FXML
-    private AnchorPane menuPane;
+    public DatePicker dateScroll;
+
+    @FXML
+    public AnchorPane menuPane;
 
     @FXML
     public Button deleteButton;
 
-@FXML
-public Button backButton;
+    @FXML
+    public Button backButton;
 
     @FXML
-    private Button registrationButton;
+    public Button registrationButton;
 
     @FXML
-    private ListView<Reminder> remindsList;
+    public ListView<Reminder> remindsList;
 
     @FXML
-    private Button scrollAdmitButton;
+    public Button scrollAdmitButton;
 
 
     LocalDate current = LocalDate.now();
@@ -75,42 +74,42 @@ public Button backButton;
 
 
     @FXML
-    void remindsListEvent(MouseEvent event) {
+    public void remindsListEvent(MouseEvent event) {
 
     }
 
     @FXML
-    void authShow(ActionEvent event) {
+    public void authShow(ActionEvent event) {
 
     }
 
     @FXML
-    void registrationShow(ActionEvent event) {
+    public void registrationShow(ActionEvent event) {
 
     }
 
     @FXML
-    void plansShow(ActionEvent event) {
+    public void plansShow(ActionEvent event) {
 
     }
 
     @FXML
-    void scrollShow(ActionEvent event) {
+    public void scrollShow(ActionEvent event) {
 
     }
 
     @FXML
-    void back(ActionEvent event) {
+    public void back(ActionEvent event) {
         stage.setScene(mainScene);
         mainPageController.drawCalendar();
     }
 
     @FXML
-    void delete(ActionEvent event) {
+    public void delete(ActionEvent event) {
 
     }
 
-    public void drewList(){
+    public void drewList() {
         ObservableList<Reminder> observableList = FXCollections.observableList(
                 RemindStorage.getInstance().reminds
         );
@@ -125,8 +124,8 @@ public Button backButton;
         });
     }
 
-    void showNote(LocalDate noteDate, Note note){
-        if(note == null){
+    void showNote(LocalDate noteDate, Note note) {
+        if (note == null) {
             note = new Note();
             note.setDate(noteDate);
         }
@@ -134,20 +133,24 @@ public Button backButton;
         stage.setScene(notePageScene);
     }
 
-    void showReminder(Reminder reminder){
+    void showReminder(Reminder reminder) {
         remindPageController.setRemind(reminder);
         stage.setScene(remindPageScene);
     }
 
     public void init(Stage stage,
                      Client client,
+                     Scene mainScene,
+                     MainPageController mainPageController,
                      Scene notePageScene,
                      NotePageController notePageController,
                      Scene remindPageScene,
-                     RemindPageController remindPageController)
-    {
+                     RemindPageController remindPageController) {
         this.stage = stage;
         this.client = client;
+
+        this.mainScene = mainScene;
+        this.mainPageController = mainPageController;
         this.notePageScene = notePageScene;
         this.notePageController = notePageController;
         this.remindPageScene = remindPageScene;

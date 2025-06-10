@@ -31,12 +31,6 @@ import ru.nstu.logbook.Client.utils.RemindStorage;
 public class MainPageController {
 
     @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
     private Button authorizationButton;
 
     @FXML

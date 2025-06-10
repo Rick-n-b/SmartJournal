@@ -60,17 +60,17 @@ public class PageConroller {
     NoteStorage noteStorage = NoteStorage.getInstance();
     RemindStorage remindStorage = RemindStorage.getInstance();
 
-    Stage stage;
-    Client client;
+    public Stage stage;
+    public Client client;
 
-    Scene mainScene;
-    MainPageController mainPageController;
+    public Scene mainScene;
+    public MainPageController mainPageController;
 
-    Scene notePageScene;
-    NotePageController notePageController;
+    public Scene notePageScene;
+    public NotePageController notePageController;
 
-    Scene remindPageScene;
-    RemindPageController remindPageController;
+    public Scene remindPageScene;
+    public RemindPageController remindPageController;
 
 
     @FXML

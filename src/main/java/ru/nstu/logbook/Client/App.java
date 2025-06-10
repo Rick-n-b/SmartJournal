@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ru.nstu.logbook.Client.controllers.MainPageController;
 import ru.nstu.logbook.Client.controllers.NotePageController;
+import ru.nstu.logbook.Client.controllers.RemindPageController;
 import ru.nstu.logbook.Client.net.Client;
 import ru.nstu.logbook.Client.utils.NoteStorage;
 
@@ -23,17 +24,22 @@ public class App extends Application {
         stage.setScene(mainScene);
         stage.setResizable(false);
 
-        MainPageController controller = fxmlLoader.getController();
+        MainPageController mainController = fxmlLoader.getController();
 
         Client client = new Client();
 
         FXMLLoader fxmlNotePageLoader = new FXMLLoader(App.class.getResource("NotePage.fxml"));
         var notePageScene = new Scene(fxmlNotePageLoader.load());
         var notePageController = (NotePageController) fxmlNotePageLoader.getController();
-        notePageController.init(stage, client, mainScene);
+        notePageController.init(stage, client, mainScene, mainController);
+
+        FXMLLoader fxmlRemindPageLoader = new FXMLLoader(App.class.getResource("RemindPage.fxml"));
+        var remindPageScene = new Scene(fxmlRemindPageLoader.load());
+        var remindPageController = (RemindPageController) fxmlRemindPageLoader.getController();
+        remindPageController.init(stage, client, mainScene, mainController);
 
 
-        controller.init(stage, client, notePageScene, notePageController);
+        mainController.init(stage, client, notePageScene, notePageController, remindPageScene, remindPageController);
         stage.show();
 
 

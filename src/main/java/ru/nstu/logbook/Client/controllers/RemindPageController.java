@@ -1,9 +1,5 @@
 package ru.nstu.logbook.Client.controllers;
 
-import java.net.URL;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -19,17 +15,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import ru.nstu.logbook.Client.net.Client;
-import ru.nstu.logbook.Client.notes.Note;
 import ru.nstu.logbook.Client.notes.Reminder;
 import ru.nstu.logbook.Client.utils.NoteStorage;
+import ru.nstu.logbook.Client.utils.RemindStorage;
 
-public class NotePageController {
+public class RemindPageController {
 
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
 
     @FXML
     private Button authorizationButton;
@@ -38,13 +29,16 @@ public class NotePageController {
     private Label authorizedName;
 
     @FXML
+    private Button backButton;
+
+    @FXML
     private TextArea contentArea;
 
     @FXML
-    private Label date;
+    private DatePicker dateScroll;
 
     @FXML
-    private DatePicker dateScroll;
+    private Button deleteButton;
 
     @FXML
     private AnchorPane menuPane;
@@ -56,6 +50,12 @@ public class NotePageController {
     private Button registrationButton;
 
     @FXML
+    private DatePicker remindDate;
+
+    @FXML
+    private TextField remindTime;
+
+    @FXML
     private ListView<Reminder> remindsList;
 
     @FXML
@@ -64,29 +64,27 @@ public class NotePageController {
     @FXML
     private TextField topicText;
 
-    @FXML
-    private Button deleteButton;
-
     Stage stage;
     Client client;
 
     MainPageController mainPageController;
     Scene mainScene;
 
-    Note note;
+    Reminder reminder;
 
-    public void setNote(Note note) {
-        this.note = note;
-        deleteButton.setDisable(note.getTopic().isEmpty() && note.getContent().isEmpty());
+    public void setRemind(Reminder reminder) {
+        this.reminder = reminder;
+        deleteButton.setDisable(reminder.getTopic().isEmpty() && reminder.getContent().isEmpty());
 
-        topicText.setText(note.getTopic());
-        contentArea.setText(note.getContent());
-        date.setText(note.getDate().toString());
+        topicText.setText(reminder.getTopic());
+        contentArea.setText(reminder.getContent());
+        remindDate.setValue(reminder.getExpirationDate());
+
     }
 
     void save() {
-        NoteStorage.getInstance().save(note);
-        NoteStorage.getInstance().notes.put(note.getDate(), note);
+        RemindStorage.getInstance().save(reminder);
+        RemindStorage.getInstance().reminds.add(reminder);
         deleteButton.setDisable(false);
     }
 
@@ -124,7 +122,7 @@ public class NotePageController {
     @FXML
     void delete(ActionEvent event) {
         deleteButton.setDisable(true);
-        System.out.println(NoteStorage.getInstance().delete(note));
+        System.out.println(RemindStorage.getInstance().delete(reminder));
     }
 
     @FXML
@@ -134,19 +132,23 @@ public class NotePageController {
         topicText.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-                note.setTopic(topicText.getText());
+                Reminder oldReminder = reminder;
+                oldReminder.setTopic(oldValue);
+                RemindStorage.getInstance().delete(oldReminder);
+                reminder.setTopic(topicText.getText());
                 save();
             }
         });
         contentArea.textProperty().addListener(new ChangeListener<String>() {
             @Override
             public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-                note.setContent(contentArea.getText());
+                Reminder oldReminder = reminder;
+                oldReminder.setContent(oldValue);
+                RemindStorage.getInstance().delete(oldReminder);
+                reminder.setContent(contentArea.getText());
                 save();
             }
         });
-
-
     }
 
     public void init(Stage stage, Client client, Scene mainScene, MainPageController mainPageController) {

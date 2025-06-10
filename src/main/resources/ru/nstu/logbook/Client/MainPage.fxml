@@ -21,7 +21,7 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <Button fx:id="authorizationButton" layoutX="109.0" layoutY="50.0" mnemonicParsing="false" onAction="#authShow" text="Authorize">
+            <Button fx:id="authorizationButton" layoutX="113.0" layoutY="50.0" mnemonicParsing="false" onAction="#authShow" text="Authorize">
                <font>
                   <Font size="14.0" />
                </font>
@@ -41,7 +41,7 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <DatePicker fx:id="dateScroll" layoutX="13.0" layoutY="185.0" />
+            <DatePicker fx:id="dateScroll" layoutX="13.0" layoutY="185.0" prefHeight="25.0" prefWidth="178.0" />
             <Label layoutX="13.0" layoutY="153.0" text="View tasks as scroll since:">
                <font>
                   <Font size="16.0" />
@@ -52,7 +52,17 @@
                   <Font size="14.0" />
                </font>
             </Button>
-            <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" onMouseClicked="#remindsListEvent" prefHeight="249.0" prefWidth="174.0" />
+            <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" onMouseClicked="#remindsListEvent" prefHeight="249.0" prefWidth="178.0" />
+            <Button fx:id="backButton" disable="true" layoutX="13.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Back" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+            <Button fx:id="deleteButton" disable="true" layoutX="133.0" layoutY="557.0" mnemonicParsing="false" onAction="#delete" text="Delete" visible="false">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
          </children></AnchorPane>
       <ScrollPane minWidth="600.0" prefHeight="200.0" prefWidth="200.0">
         <content>
@@ -76,24 +86,24 @@
                         <Font size="16.0" />
                      </font>
                   </Label>
-                  <GridPane fx:id="calendar" alignment="CENTER" gridLinesVisible="true" layoutX="31.0" layoutY="76.0" prefHeight="490.0" prefWidth="630.0" AnchorPane.bottomAnchor="26.0">
+                  <GridPane fx:id="calendar" alignment="CENTER" gridLinesVisible="true" layoutX="31.0" layoutY="76.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="490.0" prefWidth="630.0" AnchorPane.bottomAnchor="26.0">
                     <columnConstraints>
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                      <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="10.0" prefWidth="90.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="90.0" minWidth="90.0" prefWidth="90.0" />
                     </columnConstraints>
                     <rowConstraints>
-                        <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS" />
-                        <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="70.0" minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="ALWAYS" />
+                        <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
                     </rowConstraints>
                   </GridPane>
                </children>

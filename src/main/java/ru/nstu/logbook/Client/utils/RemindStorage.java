@@ -1,46 +1,48 @@
 package ru.nstu.logbook.Client.utils;
 
-import ru.nstu.logbook.Client.notes.Note;
+import ru.nstu.logbook.Client.notes.Reminder;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Properties;
 
-public class NoteStorage {
-    //System.getProperty("user.home") + "\\Documents\\";
-    public Map<LocalDate, Note> notes;
+public class RemindStorage {
+
+    public ArrayList<Reminder> reminds;
     private final static String OPTIONS_DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/Options.ini";
     private final static String DEFAULT_PATH = "./src/main/resources/ru/nstu/";
     private final static String NOTE_DIRECTORY = "reminds";
     private final static String SAVE_EXTENSION = ".bin";
     private String path;
-    private static NoteStorage instance;
+    private static RemindStorage instance;
 
-    public static NoteStorage getInstance(String path) {
+    public static RemindStorage getInstance(String path) {
         if (instance == null)
-            instance = new NoteStorage(path);
+            instance = new RemindStorage(path);
         return instance;
     }
 
-    public static NoteStorage getInstance() {
+    public static RemindStorage getInstance() {
         if (instance == null)
-            instance = new NoteStorage();
+            instance = new RemindStorage();
         return instance;
     }
 
-    private NoteStorage(String path) {
+    private RemindStorage(String path) {
         this.path = path;
         if (this.path == null) {
             this.path = System.getenv("HOME");
         }
-        notes = new HashMap<>();
+        reminds = new ArrayList<>();
     }
 
-    private NoteStorage() {
+    private RemindStorage() {
         this(DEFAULT_PATH);
     }
 
@@ -49,28 +51,39 @@ public class NoteStorage {
     }
 
     public void loadMonth(LocalDate date) {
-        notes.clear();
-        var local = LocalDate.of(date.getYear(), date.getMonth(), 1);
-        for (int days = 1; days <= local.lengthOfMonth(); days++) {
+        reminds.clear();
+        var local = date;
+        for (int days = 1; days <= 31; days++) {
 
-            Note loaded = load(local);
+            ArrayList<Reminder> loaded = load(local);
             if (loaded != null) {
-                notes.put(local, loaded);
+                reminds.addAll(loaded);
             }
-            if (local.lengthOfMonth() == local.getDayOfMonth()) {
-                return;
-            }
+
             local = local.plusDays(1);
         }
     }
 
-    public Note load(LocalDate date) {
+    public Reminder load(LocalDate date, String topic) {
 
-        var notesDir = new File(path, NOTE_DIRECTORY);
-        var noteFile = new File(notesDir, date.toString() + SAVE_EXTENSION);
-        if (noteFile.exists()) {
-            try (var in = new ObjectInputStream(new FileInputStream(noteFile))) {
-                return (Note) in.readObject();
+        var dir = new File(path, NOTE_DIRECTORY);
+        var file = new File(dir, date.toString() + SAVE_EXTENSION);
+        if (file.exists()) {
+            for(var rem : load(date)){
+                if(rem.getTopic().equals(topic))
+                    return rem;
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<Reminder> load(LocalDate date) {
+
+        var dir = new File(path, NOTE_DIRECTORY);
+        var file = new File(dir, date.toString() + SAVE_EXTENSION);
+        if (file.exists()) {
+            try (var in = new ObjectInputStream(new FileInputStream(file))) {
+                return (ArrayList<Reminder>) in.readObject();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (ClassNotFoundException e) {
@@ -80,33 +93,42 @@ public class NoteStorage {
         return null;
     }
 
-    public void save(Note note) {
-        var notesDir = new File(path, NOTE_DIRECTORY);
-        var noteFile = new File(notesDir, note.getDate().toString() + SAVE_EXTENSION);
+    public void save(Reminder reminder) {
+        var dir = new File(path, NOTE_DIRECTORY);
+        var file = new File(dir, reminder.getExpirationDate().toString() + SAVE_EXTENSION);
 
-        if (!notesDir.exists())
-            notesDir.mkdir();
+        if (!dir.exists())
+            dir.mkdir();
 
-        if (!noteFile.exists()) {
+        if (!file.exists()) {
             try {
-                noteFile.createNewFile();
+                file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(noteFile))) {
-            out.writeObject(note);
+        ArrayList<Reminder> reminders = load(reminder.getExpirationDate());
+        reminders.add(reminder);
+
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            out.writeObject(reminders);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public boolean delete(Note note) {
-        var notesDir = new File(path, NOTE_DIRECTORY);
-        var noteFile = new File(notesDir, note.getDate().toString() + SAVE_EXTENSION);
+    public boolean delete(Reminder reminder) {
+        var dir = new File(path, NOTE_DIRECTORY);
+        var file = new File(dir, reminder.getExpirationDate().toString() + SAVE_EXTENSION);
         try {
-            return Files.deleteIfExists(Path.of(noteFile.getPath()));
+            if(load(reminder.getExpirationDate()).remove(reminder)){
+                if(load(reminder.getExpirationDate()).isEmpty())
+                    return Files.deleteIfExists(Path.of(file.getPath()));
+                return true;
+            }
+            return false;
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

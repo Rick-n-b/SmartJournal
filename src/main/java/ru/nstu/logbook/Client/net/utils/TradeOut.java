@@ -1,4 +1,4 @@
-package ru.nstu.logbook.Client.net.Trades;
+package ru.nstu.logbook.Client.net.utils;
 
 import ru.nstu.logbook.Shared.trades.*;
 

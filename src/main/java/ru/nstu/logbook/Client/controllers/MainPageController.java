@@ -3,21 +3,24 @@ package ru.nstu.logbook.Client.controllers;
 import java.net.URL;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import ru.nstu.logbook.Client.notes.ShortNote;
-import ru.nstu.logbook.Client.reminds.ShortReminder;
-import ru.nstu.logbook.Client.utils.CalendarWeek;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
+import ru.nstu.logbook.Client.net.Client;
+import ru.nstu.logbook.Client.notes.Note;
+import ru.nstu.logbook.Client.notes.Reminder;
+import ru.nstu.logbook.Client.utils.NoteStorage;
 
 public class MainPageController {
 
@@ -34,7 +37,7 @@ public class MainPageController {
     private Label authorizedName;
 
     @FXML
-    private TableView<CalendarWeek> calendar;
+    private GridPane calendar;
 
     @FXML
     private DatePicker datePicker;
@@ -61,7 +64,7 @@ public class MainPageController {
     private Button registrationButton;
 
     @FXML
-    private ListView<ShortReminder> remindsList;
+    private ListView<Reminder> remindsList;
 
     @FXML
     private Button scrollAdmitButton;
@@ -70,22 +73,25 @@ public class MainPageController {
     private Label yearLabel;
 
     LocalDate current = LocalDate.now();
+    LocalDate calendarDate = LocalDate.now();
+    NoteStorage noteStorage = NoteStorage.getInstance();
 
-    List<TableColumn<CalendarWeek, ShortNote>> columns = new ArrayList<TableColumn<CalendarWeek, ShortNote>>();
+    Stage stage;
+    Client client;
 
+    Scene notePageScene;
+    NotePageController notePageController;
 
     @FXML
     void nextMonth(ActionEvent event) {
-        current = current.plusMonths(1);
-        monthLabel.setText(current.getMonth().name());
-        yearLabel.setText(String.valueOf(current.getYear()));
+        calendarDate = calendarDate.plusMonths(1);
+        drawCalendar();
     }
 
     @FXML
     void prevMonth(ActionEvent event) {
-        current = current.minusMonths(1);
-        monthLabel.setText(current.getMonth().name());
-        yearLabel.setText(String.valueOf(current.getYear()));
+        calendarDate = calendarDate.minusMonths(1);
+        drawCalendar();
     }
 
     @FXML
@@ -115,42 +121,87 @@ public class MainPageController {
 
     @FXML
     void goToDate(ActionEvent event) {
-
+        calendarDate = datePicker.valueProperty().getValue();
+        drawCalendar();
     }
 
-    @FXML
-    void initialize() {
+    private void drawCalendar(){
+        monthLabel.setText(calendarDate.getMonth().name());
+        yearLabel.setText(String.valueOf(calendarDate.getYear()));
+
+        int size = calendar.getChildren().size();
+
+        for(int i = 8; i < size; i++){
+            calendar.getChildren().removeLast();
+        }
+
+        int days = 1;
+
+        LocalDate localDate = LocalDate.of(calendarDate.getYear(), calendarDate.getMonth(), 1);
+        noteStorage.loadMonth(localDate);
+        //noteStorage.notes.put(current, new Note());
+        for(int i = 1; i < 7; i++){
+            for(int j = 1; j <= 7; j++){
+                if(localDate.getDayOfWeek() == DayOfWeek.of(j)){
+                    var dayLabel = new Label(String.valueOf(days));
+                    dayLabel.setMinHeight(70);
+                    dayLabel.setMinWidth(90);
+                    dayLabel.setMaxHeight(70);
+                    dayLabel.setMaxWidth(90);
+                    dayLabel.setPrefHeight(70);
+                    dayLabel.setPrefWidth(90);
+
+                    dayLabel.setBackground(Background.fill(Paint.valueOf("cyan")));
+
+
+                    LocalDate finalLocalDate = localDate;
+                    dayLabel.setOnMouseClicked(e ->  {
+                        showNote(finalLocalDate ,noteStorage.notes.get(finalLocalDate));
+                    });
+                    if(noteStorage.notes.containsKey(localDate))
+                        dayLabel.setText(days + "\n" + noteStorage.notes.get(localDate).getTopic());
+                    dayLabel.setAlignment(Pos.CENTER);
+                    calendar.add(dayLabel, j - 1,  i);
+
+                    if(days == localDate.lengthOfMonth())
+                        return;
+                    localDate = localDate.plusDays(1);
+                    days++;
+                }
+            }
+        }
+    }
+
+    void showNote(LocalDate noteDate, Note note){
+        if(note == null){
+            note = new Note();
+            note.setDate(noteDate);
+        }
+        notePageController.setNote(note);
+        stage.setScene(notePageScene);
+    }
+
+    public void init(Stage stage,
+                     Client client,
+                     Scene notePageScene,
+                     NotePageController notePageController)
+    {
+        this.stage = stage;
+        this.client = client;
+        this.notePageScene = notePageScene;
+        this.notePageController = notePageController;
+
 
         datePicker.valueProperty().setValue(current);
         monthLabel.setText(current.getMonth().name());
         yearLabel.setText(String.valueOf(current.getYear()));
 
+        for (int i = 0; i < 7; i++)
+            calendar.add(new Label(DayOfWeek.of(i + 1).name()), i, 0);
 
-        for (int i = 1; i <= 7; i++) {
-            columns.add(new TableColumn<CalendarWeek, ShortNote>(DayOfWeek.of(i).name()));
-            columns.getLast().setCellValueFactory(new PropertyValueFactory<CalendarWeek, ShortNote>("note" + String.valueOf(i)));
-            columns.getLast().setSortable(false);
-            columns.getLast().setReorderable(false);
-            columns.getLast().setPrefWidth(90);
-            columns.getLast().setEditable(false);
-            calendar.getColumns().add(columns.getLast());
-        }
-        calendar.setEditable(false);
-        var week1 = new CalendarWeek();
-        week1.note1 = new ShortNote(LocalDate.of(2025, 6, 12));
-        week1.note2 = new ShortNote(LocalDate.of(2025, 6, 13));
-        week1.note6 = new ShortNote(LocalDate.of(2025, 6, 16));
-        var week2 = new CalendarWeek();
-        week2.note1 = new ShortNote(LocalDate.of(2025, 6, 19));
-        week2.note2 = new ShortNote(LocalDate.of(2025, 6, 20));
-
-        ObservableList<CalendarWeek> notes = FXCollections.observableArrayList(
-                week1,
-                week2
-        );
-        calendar.setItems(notes);
-
+        drawCalendar();
+        stage.getScene();
+        noteStorage.loadConf();
 
     }
-
 }

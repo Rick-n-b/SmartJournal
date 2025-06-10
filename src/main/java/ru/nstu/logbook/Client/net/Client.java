@@ -1,13 +1,15 @@
 package ru.nstu.logbook.Client.net;
 
 
+import ru.nstu.logbook.Client.net.utils.ShortTrade;
+import ru.nstu.logbook.Client.net.utils.TradeIn;
+import ru.nstu.logbook.Client.net.utils.TradeOut;
 import ru.nstu.logbook.Shared.trades.*;
 import ru.nstu.logbook.Shared.messages.*;
 import ru.nstu.logbook.Shared.requests.*;
 import ru.nstu.logbook.Shared.responses.*;
 import ru.nstu.logbook.Shared.network.*;
 import ru.nstu.logbook.Shared.events.*;
-import ru.nstu.logbook.Client.net.Trades.*;
 
 import java.io.IOException;
 import java.io.Serializable;

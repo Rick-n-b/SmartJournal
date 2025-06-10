@@ -11,10 +11,9 @@ module ru.nstu.logbook.Client {
     opens ru.nstu.logbook.Client.controllers to javafx.fxml;
 
     exports ru.nstu.logbook.Client.utils;
-    exports ru.nstu.logbook.Client.net.Trades;
+    exports ru.nstu.logbook.Client.net.utils;
     exports ru.nstu.logbook.Client.net;
     exports ru.nstu.logbook.Client.notes;
-    exports ru.nstu.logbook.Client.reminds;
     exports ru.nstu.logbook.Shared.dto;
     exports ru.nstu.logbook.Shared.messages;
     exports ru.nstu.logbook.Shared.requests;

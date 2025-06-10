@@ -61,6 +61,7 @@
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.fxml</include>
+                    <include>**/Client/*.fxml</include>
                 </includes>
             </resource>
         </resources>

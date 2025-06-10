@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Note implements Serializable {
+     static final long serialVersionUID = 8129437039424566964L;
+
      LocalDate date = LocalDate.now();
      String topic = "";
      String content = "";

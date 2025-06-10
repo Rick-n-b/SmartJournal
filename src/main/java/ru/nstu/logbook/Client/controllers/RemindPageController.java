@@ -4,50 +4,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import ru.nstu.logbook.Client.net.Client;
 import ru.nstu.logbook.Client.notes.Reminder;
-import ru.nstu.logbook.Client.utils.NoteStorage;
 import ru.nstu.logbook.Client.utils.RemindStorage;
 
-public class RemindPageController {
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-
-    @FXML
-    private Button authorizationButton;
-
-    @FXML
-    private Label authorizedName;
-
-    @FXML
-    private Button backButton;
+public class RemindPageController extends PageController {
 
     @FXML
     private TextArea contentArea;
-
-    @FXML
-    private DatePicker dateScroll;
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private AnchorPane menuPane;
-
-    @FXML
-    private Button plansButton;
-
-    @FXML
-    private Button registrationButton;
 
     @FXML
     private DatePicker remindDate;
@@ -56,106 +26,125 @@ public class RemindPageController {
     private TextField remindTime;
 
     @FXML
-    private ListView<Reminder> remindsList;
-
-    @FXML
-    private Button scrollAdmitButton;
-
-    @FXML
     private TextField topicText;
 
-    Stage stage;
-    Client client;
 
-    MainPageController mainPageController;
-    Scene mainScene;
+    ChangeListener<String> topicListener = new ChangeListener<String>() {
+        @Override
+        public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+            deleteButton.setDisable(false);
 
-    Reminder reminder;
+            if(oldValue != null){
+                Reminder oldReminder = reminder;
+                oldReminder.setTopic(oldValue);
+                RemindStorage.getInstance().delete(oldReminder);
+            }
 
-    public void setRemind(Reminder reminder) {
-        this.reminder = reminder;
-        deleteButton.setDisable(reminder.getTopic().isEmpty() && reminder.getContent().isEmpty());
+            reminder.setTopic(topicText.getText());
+            save(reminder);
+            drawList();
 
-        topicText.setText(reminder.getTopic());
-        contentArea.setText(reminder.getContent());
-        remindDate.setValue(reminder.getExpirationDate());
+        }
+    };
+    ChangeListener<String> contentListener =  new ChangeListener<String>() {
+        @Override
+        public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
 
-    }
+            deleteButton.setDisable(false);
+            if(oldValue != null){
+                Reminder oldReminder = reminder;
+                oldReminder.setContent(oldValue);
+                RemindStorage.getInstance().delete(oldReminder);
+            }
+            reminder.setContent(contentArea.getText());
+            save(reminder);
+            drawList();
+        }
+    };
+    ChangeListener<LocalDate> dateListener = new ChangeListener<LocalDate>() {
+        @Override
+        public void changed(final ObservableValue<? extends LocalDate> observable, final LocalDate oldValue, final LocalDate newValue) {
 
-    void save() {
-        RemindStorage.getInstance().save(reminder);
-        RemindStorage.getInstance().reminds.add(reminder);
-        deleteButton.setDisable(false);
+            deleteButton.setDisable(false);
+            if(oldValue != null) {
+                Reminder oldReminder = reminder;
+                oldReminder.setExpirationDate(oldValue);
+                RemindStorage.getInstance().delete(oldReminder);
+            }
+            if(remindDate.getValue().isAfter(current.minusDays(1))){
+                reminder.setExpirationDate(remindDate.getValue());
+                remindDate.setValue(current);
+            }
+
+            save(reminder);
+            drawList();
+        }
+    };
+    ChangeListener<String> timeListener = new ChangeListener<String>() {
+        @Override
+        public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
+            if (remindTime.getText().matches("[0-2][0-4]:[0-5][0-9]$")) {
+                deleteButton.setDisable(false);
+                if(oldValue != null) {
+                    Reminder oldReminder = reminder;
+                    var time = LocalTime.parse(oldValue);
+                    oldReminder.setExpirationTime(time);
+                    RemindStorage.getInstance().delete(oldReminder);
+                }
+                reminder.setExpirationTime(LocalTime.parse(newValue));
+                save(reminder);
+                drawList();
+            }
+        }
+    };
+
+    Reminder reminder = new Reminder();
+
+    public void setRemind(Reminder rem) {
+        if (rem == null) {
+            this.reminder = new Reminder();
+        } else {
+            this.reminder = rem;
+            topicText.setText(rem.getTopic());
+            contentArea.setText(rem.getContent());
+            remindDate.setValue(rem.getExpirationDate());
+            remindTime.setText(rem.getExpirationTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
+
+        deleteButton.setDisable(this.reminder.getTopic().isEmpty() && this.reminder.getContent().isEmpty());
+
+        topicText.textProperty().addListener(topicListener);
+        contentArea.textProperty().addListener(contentListener);
+        remindDate.valueProperty().addListener(dateListener);
+        remindTime.textProperty().addListener(timeListener);
+
     }
 
     @FXML
-    void authShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void plansShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void registrationShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void remindsListEvent(MouseEvent event) {
-
-    }
-
-    @FXML
-    void scrollShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void back(ActionEvent event) {
-        stage.setScene(mainScene);
-        mainPageController.drawCalendar();
-    }
-
-    @FXML
-    void delete(ActionEvent event) {
+    public void delete(ActionEvent event) {
         deleteButton.setDisable(true);
-        System.out.println(RemindStorage.getInstance().delete(reminder));
+        RemindStorage.getInstance().delete(reminder);
+        drawList();
+    }
+
+    @FXML
+    public void back(ActionEvent event){
+        drawList();
+        topicText.textProperty().removeListener(topicListener);
+        contentArea.textProperty().removeListener(contentListener);
+        remindDate.valueProperty().removeListener(dateListener);
+        remindTime.textProperty().removeListener(timeListener);
+        stage.setScene(mainScene);
+        mainPageController.drawList();
     }
 
     @FXML
     void initialize() {
 
         contentArea.setWrapText(true);
-        topicText.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-                Reminder oldReminder = reminder;
-                oldReminder.setTopic(oldValue);
-                RemindStorage.getInstance().delete(oldReminder);
-                reminder.setTopic(topicText.getText());
-                save();
-            }
-        });
-        contentArea.textProperty().addListener(new ChangeListener<String>() {
-            @Override
-            public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-                Reminder oldReminder = reminder;
-                oldReminder.setContent(oldValue);
-                RemindStorage.getInstance().delete(oldReminder);
-                reminder.setContent(contentArea.getText());
-                save();
-            }
-        });
-    }
+        remindDate.setValue(LocalDate.now().plusDays(1));
+        remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
 
-    public void init(Stage stage, Client client, Scene mainScene, MainPageController mainPageController) {
-        this.stage = stage;
-        this.client = client;
-        this.mainScene = mainScene;
-        this.mainPageController = mainPageController;
-    }
 
+    }
 }

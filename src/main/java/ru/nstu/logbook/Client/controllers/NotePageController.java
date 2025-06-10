@@ -23,19 +23,8 @@ import ru.nstu.logbook.Client.notes.Note;
 import ru.nstu.logbook.Client.notes.Reminder;
 import ru.nstu.logbook.Client.utils.NoteStorage;
 
-public class NotePageController {
+public class NotePageController extends PageController {
 
-    @FXML
-    private ResourceBundle resources;
-
-    @FXML
-    private URL location;
-
-    @FXML
-    private Button authorizationButton;
-
-    @FXML
-    private Label authorizedName;
 
     @FXML
     private TextArea contentArea;
@@ -44,44 +33,23 @@ public class NotePageController {
     private Label date;
 
     @FXML
-    private DatePicker dateScroll;
-
-    @FXML
-    private AnchorPane menuPane;
-
-    @FXML
-    private Button plansButton;
-
-    @FXML
-    private Button registrationButton;
-
-    @FXML
-    private ListView<Reminder> remindsList;
-
-    @FXML
-    private Button scrollAdmitButton;
-
-    @FXML
     private TextField topicText;
 
     @FXML
     private Button deleteButton;
 
-    Stage stage;
-    Client client;
-
-    MainPageController mainPageController;
-    Scene mainScene;
-
     Note note;
 
     public void setNote(Note note) {
-        this.note = note;
-        deleteButton.setDisable(note.getTopic().isEmpty() && note.getContent().isEmpty());
+        if(note == null)
+            this.note = new Note();
+        else
+            this.note = note;
 
-        topicText.setText(note.getTopic());
-        contentArea.setText(note.getContent());
-        date.setText(note.getDate().toString());
+        deleteButton.setDisable(this.note.getTopic().isEmpty() && this.note.getContent().isEmpty());
+        topicText.setText(this.note.getTopic());
+        contentArea.setText(this.note.getContent());
+        date.setText(this.note.getDate().toString());
     }
 
     void save() {
@@ -91,40 +59,10 @@ public class NotePageController {
     }
 
     @FXML
-    void authShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void plansShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void registrationShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void remindsListEvent(MouseEvent event) {
-
-    }
-
-    @FXML
-    void scrollShow(ActionEvent event) {
-        save();
-    }
-
-    @FXML
-    void back(ActionEvent event) {
-        stage.setScene(mainScene);
-        mainPageController.drawCalendar();
-    }
-
-    @FXML
-    void delete(ActionEvent event) {
+    public void delete(ActionEvent event) {
         deleteButton.setDisable(true);
         System.out.println(NoteStorage.getInstance().delete(note));
+        drawList();
     }
 
     @FXML
@@ -148,12 +86,4 @@ public class NotePageController {
 
 
     }
-
-    public void init(Stage stage, Client client, Scene mainScene, MainPageController mainPageController) {
-        this.stage = stage;
-        this.client = client;
-        this.mainScene = mainScene;
-        this.mainPageController = mainPageController;
-    }
-
 }

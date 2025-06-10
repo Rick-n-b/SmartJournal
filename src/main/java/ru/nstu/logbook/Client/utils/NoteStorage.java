@@ -15,7 +15,7 @@ public class NoteStorage {
     public Map<LocalDate, Note> notes;
     private final static String OPTIONS_DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/Options.ini";
     private final static String DEFAULT_PATH = "./src/main/resources/ru/nstu/";
-    private final static String NOTE_DIRECTORY = "reminds";
+    private final static String NOTE_DIRECTORY = "notes";
     private final static String SAVE_EXTENSION = ".bin";
     private String path;
     private static NoteStorage instance;

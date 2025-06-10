@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ru.nstu.logbook.Client.controllers.MainPageController;
 import ru.nstu.logbook.Client.controllers.NotePageController;
+import ru.nstu.logbook.Client.controllers.PlansPageController;
 import ru.nstu.logbook.Client.controllers.RemindPageController;
 import ru.nstu.logbook.Client.net.Client;
 import ru.nstu.logbook.Client.utils.NoteStorage;
@@ -31,18 +32,40 @@ public class App extends Application {
         FXMLLoader fxmlNotePageLoader = new FXMLLoader(App.class.getResource("NotePage.fxml"));
         var notePageScene = new Scene(fxmlNotePageLoader.load());
         var notePageController = (NotePageController) fxmlNotePageLoader.getController();
-        notePageController.init(stage, client, mainScene, mainController);
 
         FXMLLoader fxmlRemindPageLoader = new FXMLLoader(App.class.getResource("RemindPage.fxml"));
         var remindPageScene = new Scene(fxmlRemindPageLoader.load());
         var remindPageController = (RemindPageController) fxmlRemindPageLoader.getController();
-        remindPageController.init(stage, client, mainScene, mainController);
 
+        FXMLLoader fxmlPlansPageLoader = new FXMLLoader(App.class.getResource("PlansPage.fxml"));
+        var plansPageScene = new Scene(fxmlPlansPageLoader.load());
+        var plansPageController = (PlansPageController) fxmlPlansPageLoader.getController();
 
-        mainController.init(stage, client, notePageScene, notePageController, remindPageScene, remindPageController);
+        notePageController.init(stage, client,
+                mainScene, mainController,
+                notePageScene, notePageController,
+                remindPageScene, remindPageController,
+                plansPageScene, plansPageController);
+
+        remindPageController.init(stage, client,
+                mainScene, mainController,
+                notePageScene, notePageController,
+                remindPageScene, remindPageController,
+                plansPageScene, plansPageController);
+
+        mainController.init(stage, client,
+                mainScene, mainController,
+                notePageScene, notePageController,
+                remindPageScene, remindPageController,
+                plansPageScene, plansPageController);
+
+        plansPageController.init(stage, client,
+                mainScene, mainController,
+                notePageScene, notePageController,
+                remindPageScene, remindPageController,
+                plansPageScene, plansPageController);
+
         stage.show();
-
-
 
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override

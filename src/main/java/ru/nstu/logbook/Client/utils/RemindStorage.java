@@ -1,5 +1,6 @@
 package ru.nstu.logbook.Client.utils;
 
+import javafx.scene.SubScene;
 import ru.nstu.logbook.Client.notes.Reminder;
 
 import java.io.*;
@@ -8,8 +9,6 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
 import java.util.Properties;
 
 public class RemindStorage {
@@ -52,8 +51,8 @@ public class RemindStorage {
 
     public void loadMonth(LocalDate date) {
         reminds.clear();
-        var local = date;
-        for (int days = 1; days <= 31; days++) {
+        var local = date.minusDays(30);
+        for (int days = 1; days <= 31 * 2; days++) {
 
             ArrayList<Reminder> loaded = load(local);
             if (loaded != null) {
@@ -84,9 +83,7 @@ public class RemindStorage {
         if (file.exists()) {
             try (var in = new ObjectInputStream(new FileInputStream(file))) {
                 return (ArrayList<Reminder>) in.readObject();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -96,7 +93,7 @@ public class RemindStorage {
     public void save(Reminder reminder) {
         var dir = new File(path, NOTE_DIRECTORY);
         var file = new File(dir, reminder.getExpirationDate().toString() + SAVE_EXTENSION);
-
+        var reminders = new ArrayList<Reminder>();
         if (!dir.exists())
             dir.mkdir();
 
@@ -106,26 +103,44 @@ public class RemindStorage {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        } else {
+            reminders = load(reminder.getExpirationDate());
         }
-
-        ArrayList<Reminder> reminders = load(reminder.getExpirationDate());
-        reminders.add(reminder);
-
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+            reminders.add(reminder);
             out.writeObject(reminders);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public boolean delete(Reminder reminder) {
         var dir = new File(path, NOTE_DIRECTORY);
         var file = new File(dir, reminder.getExpirationDate().toString() + SAVE_EXTENSION);
+        reminds.remove(reminder);
+        ArrayList<Reminder> reminders = load(reminder.getExpirationDate());
         try {
-            if(load(reminder.getExpirationDate()).remove(reminder)){
-                if(load(reminder.getExpirationDate()).isEmpty())
-                    return Files.deleteIfExists(Path.of(file.getPath()));
-                return true;
+            if(reminders != null){
+                for(var rem : reminders) {
+                    if(rem.getContent().equals(reminder.getContent()) &&
+                            rem.getExpirationTime().toString().equals(reminder.getExpirationTime().toString()) &&
+                            rem.getTopic().equals(reminder.getTopic()) &&
+                            rem.getExpirationDate().toString().equals(reminder.getExpirationDate().toString())
+                    ){
+                        reminders.remove(rem);
+                        if (reminders.isEmpty())
+                            return Files.deleteIfExists(Path.of(file.getPath()));
+                        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
+                            reminders.remove(reminder);
+                            out.writeObject(reminders);
+                            out.flush();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return true;
+                    }
+                }
             }
             return false;
 
@@ -133,6 +148,8 @@ public class RemindStorage {
             throw new RuntimeException(e);
         }
     }
+
+
 
     public synchronized void loadConf() {
         String path = OPTIONS_DEFAULT_PATH;

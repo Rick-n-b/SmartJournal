@@ -124,23 +124,17 @@ public class Server {
                 } catch (InterruptedException e) {
                     return;
                 }
-                System.out.println("1");
                 state = State.WAITING;
-                System.out.println("2");
-                while (clients.size() <= MAX_CAPACITY) {
+                while (clients.size() < MAX_CAPACITY) {
                     try {
-                        System.out.println("wait");
                         Socket clientSocket = serverSocket.accept();
-                        System.out.println("Connected, not reg");
                         synchronized (notRegistered) {
                             var client = new NetClient(clientSocket);
                             notRegistered.add(client);
-
+                            System.out.println("Add not registred user:" + client.name);
                             client.receivedData.subscribe(this::process);
                             client.closeEvent.subscribe(this::disconnect);
-                            //client.invalidData.subscribe();
                             client.startListen();
-                            System.out.println("Connected, reg" + client.name);
 
                         }
                     } catch (IOException e) {
@@ -189,21 +183,24 @@ public class Server {
 
     private void connect(Object sender, ConnectRequest request){
         var client = (NetClient) sender;
+        System.out.println("Try to reg client");
         if(!notRegistered.contains(client))
             return;
-
-        synchronized (clients){
+        System.out.println("1");
             client.id = generateId();
             clients.put(client.id, client);
-        }
+
+        System.out.println("2" );
         synchronized (notRegistered){
             notRegistered.remove(client);
         }
         var descriptor = new ClientDescriptor(client.id, client.name);
+        System.out.println("Client reged:" + client.name + " " + client.id);
         var response =
                 new ConnectResponse(descriptor, clients.values().stream().filter(t -> t.id != client.id).toList());
-
+        System.out.println("Create response" + response);
         var message = new ClientConnectMessage(descriptor);
+        System.out.println("Create message" + message);
         client.send(response);
         broadcast(message);
         System.out.println("Connected client " + client.id + "(" + client.name + ")");

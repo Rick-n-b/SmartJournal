@@ -12,12 +12,13 @@ public class PlansPageController extends PageController{
     @FXML
     Label date;
 
-    String path = "./src/main/resources/ru/nstu/";
+    String path = "./src/main/resources/ru/nstu/logbook/";
     String plan;
     File file = new File(path, "plans.bin");
 
     public void save(){
         if(file.exists()) {
+
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
                 out.writeObject(plan);
             } catch (IOException e) {
@@ -32,6 +33,7 @@ public class PlansPageController extends PageController{
         if(!file.exists()) {
             try {
                 file.createNewFile();
+                save();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

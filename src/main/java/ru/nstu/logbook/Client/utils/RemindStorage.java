@@ -15,7 +15,7 @@ public class RemindStorage {
 
     public ArrayList<Reminder> reminds;
     private final static String OPTIONS_DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/Options.ini";
-    private final static String DEFAULT_PATH = "./src/main/resources/ru/nstu/";
+    private final static String DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/";
     private final static String NOTE_DIRECTORY = "reminds";
     private final static String SAVE_EXTENSION = ".bin";
     private String path;
@@ -150,6 +150,40 @@ public class RemindStorage {
         }
     }
 
+
+    public void deleteAll(){
+        var dir = new File(path, NOTE_DIRECTORY);
+        File[] files = dir.listFiles();
+        if(dir.exists())
+            for (var file : files) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+    }
+
+    public void loadAll(){
+        var dir = new File(path, NOTE_DIRECTORY);
+        File[] files = dir.listFiles();
+
+        ArrayList<Reminder> allTheRems = new ArrayList<>();
+        if(dir.exists()){
+            reminds.clear();
+            for (var file : files) {
+                try (var in = new ObjectInputStream(new FileInputStream(file))) {
+                    if(file.getName().matches("YYYY-mm-dd"))
+                        allTheRems.addAll((ArrayList<Reminder>) in.readObject());
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+    public void saveAll(){
+        for(var rem : reminds){
+            save(rem);
+        }
+    }
 
 
     public synchronized void loadConf() {

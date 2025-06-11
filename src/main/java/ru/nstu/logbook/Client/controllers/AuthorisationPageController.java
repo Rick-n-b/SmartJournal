@@ -36,10 +36,9 @@ public class AuthorisationPageController {
 
     @FXML
     public void auth(ActionEvent event) throws IOException {
-        InetAddress address = null;
-        address = InetAddress.getByName("127.0.0.1");
-        client.connect(address, 8080, "asaasd");
+        client.connect(nick.getText());
     }
+
     @FXML
     public void back(ActionEvent event){
         stage.close();
@@ -61,6 +60,8 @@ public class AuthorisationPageController {
         this.authPageController = authPageController;
         stage.setScene(authPageScene);
         stage.setResizable(false);
+
+        authButton.disableProperty().bind(nick.textProperty().isNotEmpty().and(password.textProperty().isNotEmpty()));
     }
     @FXML
     public void initialize(){

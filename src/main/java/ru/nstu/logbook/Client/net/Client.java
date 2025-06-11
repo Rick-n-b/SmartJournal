@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,30 +43,57 @@ public class Client {
     public final ParamEvent<ShortTrade> tradeAccepted = new ParamEvent<>();
 
     private Status status = Status.READY;
+    private final static String[] SERVER_IPS = {"127.0.0.1"};
+    private final static int DEFAULT_PORT = 8079;
 
-    public void connect(InetAddress address, int port, String name) throws IOException {
+    public void connect(String name) throws UnknownHostException {
         if(status != Status.READY)
             return;
+
         status = Status.CONNECTING;
-        var socket = new Socket();
-        socket.connect(new InetSocketAddress(address, port));
-        networkClient = new NetClient(socket);
-        networkClient.receivedData.subscribe(this::processMessage);
-        networkClient.closeEvent.subscribe(this::onConnectionClosed);
-        networkClient.startListen();
-        networkClient.send(new ConnectRequest(name));
+
+
+
+        for(var strAddress : SERVER_IPS){
+            InetAddress address = InetAddress.getByName(strAddress);
+            for(int i = DEFAULT_PORT; i < 8100; i++){
+                System.out.println("Try to connect to " + strAddress + " " + i);
+                var socket = new Socket();
+                try {
+                    socket.connect(new InetSocketAddress(address, i));
+                    if(socket.isConnected()){
+                        try {
+                            networkClient = new NetClient(socket);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        networkClient.receivedData.subscribe(this::processMessage);
+                        networkClient.closeEvent.subscribe(this::onConnectionClosed);
+                        networkClient.startListen();
+                        networkClient.send(new ConnectRequest(name));
+                        System.out.println("Connected to " + strAddress + " " + i);
+                        return;
+                    }
+                } catch (IOException e) {
+                    ;
+                }
+
+            }
+        }
+        System.err.println("Couldn't get access to a server");
+        status = Status.READY;
     }
 
     public void disconnect() {
         if(status != Status.CONNECTED)
             return;
         status = Status.DISCONNECTING;
-        name = "";
-        id = -1;
         neighbours.clear();
         trades.clear();
         tradesUpdated.invoke(this);
         networkClient.send(new DisconnectRequest(id));
+        name = "";
+        id = -1;
         networkClient.close();
         networkClient = null;
         status = Status.READY;

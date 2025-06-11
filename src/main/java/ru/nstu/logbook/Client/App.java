@@ -17,7 +17,7 @@ import java.io.IOException;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("MainPage.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainPage.fxml"));
         Scene mainScene = new Scene(fxmlLoader.load());
         stage.setTitle("One idiot's logbook");
         stage.setScene(mainScene);
@@ -102,6 +102,7 @@ public class App extends Application {
                 NoteStorage.getInstance().saveConf();
                 Platform.exit();
                 System.exit(0);
+                client.disconnect();
             }
         );
     }

@@ -9,11 +9,13 @@ import ru.nstu.logbook.Shared.requests.*;
 import ru.nstu.logbook.Shared.responses.*;
 import ru.nstu.logbook.Shared.dto.*;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Instant;
 import java.util.*;
 
 public class Server {
@@ -131,7 +133,6 @@ public class Server {
                         synchronized (notRegistered) {
                             var client = new NetClient(clientSocket);
                             notRegistered.add(client);
-                            System.out.println("Add not registred user:" + client.name);
                             client.receivedData.subscribe(this::process);
                             client.closeEvent.subscribe(this::disconnect);
                             client.startListen();
@@ -178,32 +179,26 @@ public class Server {
             cancelTrade(client, request);
             return;
         }
-
     }
 
     private void connect(Object sender, ConnectRequest request){
         var client = (NetClient) sender;
-        System.out.println("Try to reg client");
         if(!notRegistered.contains(client))
             return;
-        System.out.println("1");
         synchronized (clients){
             client.id = generateId();
             clients.put(client.id, client);
         }
 
-
-        System.out.println("2" );
         synchronized (notRegistered){
             notRegistered.remove(client);
         }
         var descriptor = new ClientDescriptor(client.id, client.name);
-        System.out.println("Client reged:" + client.name + " " + client.id);
         var response =
                 new ConnectResponse(descriptor, clients.values().stream().filter(t -> t.id != client.id).toList());
-        System.out.println("Create response" + response);
+
         var message = new ClientConnectMessage(descriptor);
-        System.out.println("Create message" + message);
+
         client.send(response);
         broadcast(message);
         System.out.println("Connected client " + client.id + "(" + client.name + ")");
@@ -274,8 +269,8 @@ public class Server {
 
         client.send(response);
         target.send(message);
-        System.out.println("Trade " + localTradeId + " offered to client " + target + " from " + message.senderId()
-                + ". Sent: " + message.inners().offer().size() + " " + message.inners().offer().type());
+//        System.out.println("Trade " + localTradeId + " offered to client " + target + " from " + message.senderId()
+//                + ". Sent: " + message.inners().offer().size() + " " + message.inners().offer().type());
     }
 
     private void acceptTrade(NetClient client, AcceptTradeRequest request){
@@ -313,7 +308,6 @@ public class Server {
                 client.send(message);
             }
        }
-
     }
 
     private Integer generateId(){
@@ -324,8 +318,6 @@ public class Server {
         }
         return id;
     }
-
-
 
     public static void main(String[] args) throws IOException {
         var port = DEFAULT_PORT;

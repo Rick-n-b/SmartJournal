@@ -46,6 +46,8 @@ public class Client {
     private final static String[] SERVER_IPS = {"127.0.0.1"};
     private final static int DEFAULT_PORT = 8079;
 
+    public final Thread acceptingThread = new Thread(this::alwaysAccepting);
+
     public void connect(String name) throws UnknownHostException {
         if(status != Status.READY)
             return;
@@ -69,6 +71,13 @@ public class Client {
                         networkClient.closeEvent.subscribe(this::onConnectionClosed);
                         networkClient.startListen();
                         networkClient.send(new ConnectRequest(name));
+                        if(acceptingThread.getState() == Thread.State.WAITING)
+                            synchronized (acceptingThread){
+                                acceptingThread.notify();
+                            }
+                        else
+                            acceptingThread.start();
+                        acceptingThread.setDaemon(true);
                         System.out.println("Connected to " + strAddress + " " + i);
                         return;
                     }
@@ -83,7 +92,7 @@ public class Client {
     }
 
     public void disconnect() {
-        if(status != Status.CONNECTED)
+        if (status != Status.CONNECTED)
             return;
         status = Status.DISCONNECTING;
         neighbours.clear();
@@ -94,6 +103,13 @@ public class Client {
         id = -1;
         networkClient.close();
         networkClient = null;
+        synchronized (acceptingThread) {
+            try {
+                acceptingThread.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
         status = Status.READY;
     }
 
@@ -251,7 +267,7 @@ public class Client {
     }
 
     private void onTradeOffered(OfferTradeMessage message) {
-        var trade = new TradeIn(message.id(),message.inners(), message.senderId());
+        var trade = new TradeIn(message.id(), message.inners(), message.senderId());
         synchronized (trades) {
             trades.put(message.id(), trade);
         }
@@ -279,5 +295,16 @@ public class Client {
             trades.remove(message.id());
         }
         tradesUpdated.invoke(this);
+    }
+
+    public void alwaysAccepting(){
+        while(status != Status.CLOSED){
+            synchronized (trades){
+                for(var trade  : trades.values()){
+                    if(trade instanceof TradeIn)
+                        acceptTrade((TradeIn)trade);
+                }
+            }
+        }
     }
 }

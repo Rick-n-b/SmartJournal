@@ -191,7 +191,7 @@ public class PageController {
                     });
                     setWrapText(true);
                     setText(reminder.getExpirationDate().toString() + " " +
-                            reminder.getExpirationTime().format(DateTimeFormatter.ofPattern("H:m")) + " " +
+                            reminder.getExpirationTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " " +
                             reminder.getTopic());
                     ContextMenu cellCM = new ContextMenu();
                     MenuItem add = new MenuItem("Add");

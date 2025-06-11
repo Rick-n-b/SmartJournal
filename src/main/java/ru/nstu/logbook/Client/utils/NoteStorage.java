@@ -61,6 +61,7 @@ public class NoteStorage {
             }
             local = local.plusDays(1);
         }
+
     }
 
     public void loadPeriod(LocalDate since, LocalDate to) {

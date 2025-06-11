@@ -114,12 +114,12 @@ public class RemindPageController extends PageController {
         deleteButton.setDisable(reminder.getTopic().isEmpty() && reminder.getContent().isEmpty());
 
         addListeners();
-
     }
 
     @FXML
     public void delete(ActionEvent event) {
         removeListeners();
+        deleteButton.setDisable(true);
         del(reminder);
         addListeners();
         drawList();
@@ -127,14 +127,14 @@ public class RemindPageController extends PageController {
 
     @Override
     public void del(Reminder rem) {
-        deleteButton.setDisable(true);
-        topicText.clear();
-        contentArea.clear();
-        remindDate.setValue(LocalDate.now().plusDays(1));
-        remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        if(rem == reminder){
+            topicText.clear();
+            contentArea.clear();
+            remindDate.setValue(LocalDate.now().plusDays(1));
+            remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
         remindStorage.delete(rem);
         remindsList.getItems().remove(rem);
-
     }
 
     @FXML

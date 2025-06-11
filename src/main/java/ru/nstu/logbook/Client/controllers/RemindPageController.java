@@ -40,7 +40,7 @@ public class RemindPageController extends PageController {
                 RemindStorage.getInstance().delete(oldReminder);
             }
 
-            reminder.setTopic(topicText.getText());
+            reminder.setTopic(newValue);
             save(reminder);
             drawList();
 
@@ -56,9 +56,11 @@ public class RemindPageController extends PageController {
                 oldReminder.setContent(oldValue);
                 RemindStorage.getInstance().delete(oldReminder);
             }
-            reminder.setContent(contentArea.getText());
+            reminder.setContent(newValue);
             save(reminder);
             drawList();
+
+
         }
     };
     ChangeListener<LocalDate> dateListener = new ChangeListener<LocalDate>() {
@@ -72,12 +74,10 @@ public class RemindPageController extends PageController {
                 RemindStorage.getInstance().delete(oldReminder);
             }
             if(remindDate.getValue().isAfter(current.minusDays(1))){
-                reminder.setExpirationDate(remindDate.getValue());
-                remindDate.setValue(current);
+                reminder.setExpirationDate(newValue);
+                save(reminder);
+                drawList();
             }
-
-            save(reminder);
-            drawList();
         }
     };
     ChangeListener<String> timeListener = new ChangeListener<String>() {
@@ -104,14 +104,14 @@ public class RemindPageController extends PageController {
         if (rem == null) {
             this.reminder = new Reminder();
         } else {
-            this.reminder = rem;
-            topicText.setText(rem.getTopic());
-            contentArea.setText(rem.getContent());
-            remindDate.setValue(rem.getExpirationDate());
-            remindTime.setText(rem.getExpirationTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+            reminder = rem;
         }
+        topicText.setText(reminder.getTopic());
+        contentArea.setText(reminder.getContent());
+        remindDate.setValue(reminder.getExpirationDate());
+        remindTime.setText(reminder.getExpirationTime().format(DateTimeFormatter.ofPattern("HH:mm")));
 
-        deleteButton.setDisable(this.reminder.getTopic().isEmpty() && this.reminder.getContent().isEmpty());
+        deleteButton.setDisable(reminder.getTopic().isEmpty() && reminder.getContent().isEmpty());
 
         addListeners();
 
@@ -119,19 +119,26 @@ public class RemindPageController extends PageController {
 
     @FXML
     public void delete(ActionEvent event) {
-        deleteButton.setDisable(true);
         removeListeners();
-        topicText.clear();
-        contentArea.clear();
-        RemindStorage.getInstance().delete(reminder);
+        del(reminder);
         addListeners();
         drawList();
     }
 
+    @Override
+    public void del(Reminder rem) {
+        deleteButton.setDisable(true);
+        topicText.clear();
+        contentArea.clear();
+        remindDate.setValue(LocalDate.now().plusDays(1));
+        remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        remindStorage.delete(rem);
+        remindsList.getItems().remove(rem);
+
+    }
+
     @FXML
     public void back(ActionEvent event){
-        drawList();
-
         removeListeners();
         remindDate.setValue(LocalDate.now().plusDays(1));
         remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));

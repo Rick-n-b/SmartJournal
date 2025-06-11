@@ -92,9 +92,6 @@ public class MainPageController extends PageController {
         }
     }
 
-
-
-
     @FXML
     void initialize(){
         datePicker.valueProperty().setValue(current);
@@ -107,8 +104,5 @@ public class MainPageController extends PageController {
         calendar.setAlignment(Pos.CENTER);
         drawCalendar();
         noteStorage.loadConf();
-
-        remindsList.setEditable(false);
-
     }
 }

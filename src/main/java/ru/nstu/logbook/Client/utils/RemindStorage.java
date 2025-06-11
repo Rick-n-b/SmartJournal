@@ -129,6 +129,7 @@ public class RemindStorage {
                             rem.getExpirationDate().toString().equals(reminder.getExpirationDate().toString())
                     ){
                         reminders.remove(rem);
+                        reminds.remove(rem);
                         if (reminders.isEmpty())
                             return Files.deleteIfExists(Path.of(file.getPath()));
                         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {

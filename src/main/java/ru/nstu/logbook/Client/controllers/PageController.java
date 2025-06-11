@@ -52,7 +52,6 @@ public class PageController {
     @FXML
     public Button scrollAcceptButton;
 
-
     LocalDate current = LocalDate.now();
     LocalDate calendarDate = LocalDate.now();
 
@@ -136,7 +135,6 @@ public class PageController {
         deleteButton.setDisable(false);
     }
 
-
     @FXML
     public void back(ActionEvent event) {
         drawList();
@@ -151,11 +149,25 @@ public class PageController {
     }
 
     public void drawList() {
+        remindsList.getItems().clear();
         RemindStorage.getInstance().loadMonth(current);
         ObservableList<Reminder> observableList = FXCollections.observableList(
             RemindStorage.getInstance().reminds
         );
+        System.out.println("------ " + this + " ------");
+        for(var rem : observableList){
+            System.out.println(rem.toString() + "\n");
+        }
+        System.out.println("----------------------");
+
+
         remindsList.setItems(observableList);
+
+        System.out.println("------ " + "list" + " ------");
+        for(var rem : remindsList.getItems()){
+            System.out.println(rem.toString() + "\n");
+        }
+        System.out.println("----------------------");
     }
 
     public void showReminder(Reminder reminder) {
@@ -169,18 +181,14 @@ public class PageController {
     public MenuItem listChange = new MenuItem("Change");
     public MenuItem listDelete = new MenuItem("Delete");
 
-
-    public MenuItem add = new MenuItem("Add");
-    public MenuItem change = new MenuItem("Change");
-    public MenuItem delete = new MenuItem("Delete");
-
-
     public ListCell<Reminder> createList(ListView<Reminder> listView){
         return new ListCell<>(){
             @Override
             protected void updateItem(Reminder reminder, boolean empty){
-                if(empty || reminder == null)
+                super.updateItem(reminder, empty);
+                if(empty || reminder == null){
                     setText(null);
+                }
                 else{
                     setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
@@ -188,7 +196,7 @@ public class PageController {
                             if(event.getButton().equals(MouseButton.PRIMARY)){
                                 if(event.getClickCount() == 2){
                                     if(getItem()!= null){
-                                        showReminder(getItem());
+                                        showReminder(reminder);
                                     }
                                 }
                             }
@@ -199,17 +207,26 @@ public class PageController {
                             reminder.getExpirationTime().format(DateTimeFormatter.ofPattern("H:m")) + " " +
                             reminder.getTopic());
                     ContextMenu cellCM = new ContextMenu();
+                    MenuItem add = new MenuItem("Add");
+                    MenuItem change = new MenuItem("Change");
+                    MenuItem delete = new MenuItem("Delete");
+                    add.setOnAction(e -> showReminder(null));
                     change.setOnAction(e -> showReminder(reminder));
-                    delete.setOnAction(e -> {
-                        RemindStorage.getInstance().delete(reminder);
-                        this.updateItem(null, true);
-                        drawList();
-                    });
+                    delete.setOnAction(e -> del(reminder));
                     cellCM.getItems().addAll(add, change, delete);
                     setContextMenu(cellCM);
                 }
             }
         };
+    }
+
+    public void del(Reminder rem){
+        if(this == remindPageController){
+            remindPageController.del(rem);
+        }else{
+            remindStorage.delete(rem);
+            drawList();
+        }
     }
 
     public void init(Stage stage,
@@ -244,12 +261,14 @@ public class PageController {
             scrollDateSince.valueProperty().bindBidirectional(mainPageController.scrollDateSince.valueProperty());
         }
 
-
-
+        if(this != remindPageController){
+            remindsList.itemsProperty().bindBidirectional(remindPageController.remindsList.itemsProperty());
+        }
 
         remindsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        remindsList.setCellFactory(this::createList);
-
+        remindsList.setCellFactory(r -> createList(this.remindsList));
+        remindsList.setEditable(false);
+        remindsList.setFocusTraversable(false);
         remindsList.setTooltip(new Tooltip("Double click to create reminder"));
         remindsList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -259,30 +278,14 @@ public class PageController {
                         showReminder(null);
             }
         });
-        add.setOnAction(e -> {
-            showReminder(null);
-        });
+
         listAdd.setOnAction(e -> {
             showReminder(null);
-        });
-        remindsList.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.getButton().equals(MouseButton.PRIMARY)){
-                    if(event.getClickCount() == 2){
-                        showReminder(null);
-                    }
-                }
-            }
         });
         listCM.getItems().addAll(listAdd, listChange, listDelete);
         listCM.getItems().get(2).setDisable(true);
         listCM.getItems().get(1).setDisable(true);
         remindsList.setContextMenu(listCM);
         drawList();
-
-
-        //scrollDateSince.setValue(LocalDate.now().minusDays(7));
-        //scrollDateTo.setValue(LocalDate.now().plusDays(7));
     }
 }

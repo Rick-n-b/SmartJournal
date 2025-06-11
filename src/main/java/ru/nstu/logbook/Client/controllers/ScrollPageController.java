@@ -21,7 +21,6 @@ public class ScrollPageController extends PageController{
     public void setDates(LocalDate sinceDate, LocalDate toDate){
         this.sinceDate = sinceDate;
         this.toDate = toDate;
-        drawList();
         noteStorage.loadPeriod(sinceDate, toDate);
         mainBox.getChildren().clear();
         for(var note : noteStorage.notes.values()){

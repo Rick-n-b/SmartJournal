@@ -62,7 +62,6 @@ public class NotePageController extends PageController {
     public void delete(ActionEvent event) {
         deleteButton.setDisable(true);
         System.out.println(NoteStorage.getInstance().delete(note));
-        drawList();
     }
 
     @FXML

@@ -137,7 +137,6 @@ public class PageController {
 
     @FXML
     public void back(ActionEvent event) {
-        drawList();
         stage.setScene(mainScene);
         mainPageController.drawCalendar();
         mainPageController.drawList();
@@ -145,7 +144,6 @@ public class PageController {
 
     @FXML
     public void delete(ActionEvent event) {
-        drawList();
     }
 
     public void drawList() {
@@ -154,20 +152,7 @@ public class PageController {
         ObservableList<Reminder> observableList = FXCollections.observableList(
             RemindStorage.getInstance().reminds
         );
-        System.out.println("------ " + this + " ------");
-        for(var rem : observableList){
-            System.out.println(rem.toString() + "\n");
-        }
-        System.out.println("----------------------");
-
-
         remindsList.setItems(observableList);
-
-        System.out.println("------ " + "list" + " ------");
-        for(var rem : remindsList.getItems()){
-            System.out.println(rem.toString() + "\n");
-        }
-        System.out.println("----------------------");
     }
 
     public void showReminder(Reminder reminder) {

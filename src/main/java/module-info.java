@@ -4,6 +4,7 @@ module ru.nstu.logbook.Client {
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
+    requires java.sql;
 
     exports ru.nstu.logbook.Client;
     opens ru.nstu.logbook.Client to javafx.fxml;

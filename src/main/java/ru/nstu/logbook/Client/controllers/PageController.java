@@ -76,6 +76,8 @@ public class PageController {
     public Scene scrollPageScene;
     public ScrollPageController scrollPageController;
 
+    public Scene authPageScene;
+    public AuthorisationPageController authPageController;
 
     @FXML
     public void remindsListEvent(MouseEvent event) {
@@ -84,7 +86,7 @@ public class PageController {
 
     @FXML
     public void authShow(ActionEvent event) {
-
+        authPageController.show();
     }
 
     @FXML
@@ -225,7 +227,9 @@ public class PageController {
                      Scene plansPageScene,
                      PlansPageController plansPageController,
                      Scene scrollPageScene,
-                     ScrollPageController scrollPageController)
+                     ScrollPageController scrollPageController,
+                     Scene authPageScene,
+                     AuthorisationPageController authPageController)
     {
         this.stage = stage;
         this.client = client;
@@ -240,6 +244,8 @@ public class PageController {
         this.plansPageController = plansPageController;
         this.scrollPageScene = scrollPageScene;
         this.scrollPageController = scrollPageController;
+        this.authPageScene = authPageScene;
+        this.authPageController = authPageController;
 
         if(this != mainPageController){
             scrollDateTo.valueProperty().bindBidirectional(mainPageController.scrollDateTo.valueProperty());

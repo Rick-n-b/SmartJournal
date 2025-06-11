@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import ru.nstu.logbook.Client.controllers.*;
@@ -42,40 +43,58 @@ public class App extends Application {
         var scrollPageScene = new Scene(fxmlScrollPageLoader.load());
         var scrollPageController = (ScrollPageController) fxmlScrollPageLoader.getController();
 
+        FXMLLoader fxmlAuthPageLoader = new FXMLLoader(App.class.getResource("AuthorisationPage.fxml"));
+        var authPageScene = new Scene(fxmlAuthPageLoader.load());
+        var authPageController = (AuthorisationPageController) fxmlAuthPageLoader.getController();
+
         notePageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
                 plansPageScene, plansPageController,
-                scrollPageScene, scrollPageController);
+                scrollPageScene, scrollPageController,
+                authPageScene, authPageController);
 
         remindPageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
                 plansPageScene, plansPageController,
-                scrollPageScene, scrollPageController);
+                scrollPageScene, scrollPageController,
+                authPageScene, authPageController);
 
         mainController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
                 plansPageScene, plansPageController,
-                scrollPageScene, scrollPageController);
+                scrollPageScene, scrollPageController,
+                authPageScene, authPageController);
 
         plansPageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
                 plansPageScene, plansPageController,
-                scrollPageScene, scrollPageController);
+                scrollPageScene, scrollPageController,
+                authPageScene, authPageController);
 
         scrollPageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
                 plansPageScene, plansPageController,
-                scrollPageScene, scrollPageController);
+                scrollPageScene, scrollPageController,
+                authPageScene, authPageController);
+
+        Stage authStage = new Stage();
+        authStage.initModality(Modality.WINDOW_MODAL);
+        authStage.initOwner(stage.getScene().getWindow());
+
+        authPageController.init(authStage, client,
+                mainScene, mainController,
+                authPageScene, authPageController);
+
 
         stage.show();
 

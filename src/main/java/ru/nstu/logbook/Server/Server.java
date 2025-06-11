@@ -9,6 +9,7 @@ import ru.nstu.logbook.Shared.requests.*;
 import ru.nstu.logbook.Shared.responses.*;
 import ru.nstu.logbook.Shared.dto.*;
 
+import java.sql.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
@@ -43,14 +44,17 @@ public class Server {
     public Server(int port, int capacity) throws IOException {
         this.port = port;
         this.capacity = capacity;
+
         serverSocket = new ServerSocket(port);
         clients = new HashMap<>();
         notRegistered = new ArrayList<>();
         trades = new ArrayList<>();
+
         waitThread = new Thread(this::waiting);
         waitThread.setDaemon(true);
+        waitThread.start();
         state = State.STOPPED;
-        waitingToStop();
+        while (waitThread.getState() != Thread.State.WAITING);
     }
 
     public Server(int port) throws IOException {
@@ -59,19 +63,22 @@ public class Server {
 
     public void start(){
         if(state != State.STOPPED)
-            state = State.STARTING;
+            return;
+
+        state = State.STARTING;
         beginWaiting();
     }
 
-    private  void waitingToStop(){
-        if(state != State.STOPPED)
-            try {
-                synchronized (this){
-                    this.wait();
-                }
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+    public void waitingToStop() {
+        if (state == State.STOPPED)
+            return;
+        try {
+            synchronized (this) {
+                this.wait();
             }
+        } catch (InterruptedException e) {
+            return;
+        }
     }
 
     public void stop() {//необходимо нежно прерывать все связи
@@ -104,10 +111,7 @@ public class Server {
         if (state == State.WAITING || state == State.STOPPED || state == State.STOPPING)
             return;
         synchronized (waitThread) {
-            if (waitThread.getState() == Thread.State.WAITING)
-                waitThread.notify();
-            else
-                waitThread.start();
+            waitThread.notify();
         }
     }
 
@@ -120,10 +124,14 @@ public class Server {
                 } catch (InterruptedException e) {
                     return;
                 }
+                System.out.println("1");
                 state = State.WAITING;
-                while (clients.size() < MAX_CAPACITY) {
+                System.out.println("2");
+                while (clients.size() <= MAX_CAPACITY) {
                     try {
+                        System.out.println("wait");
                         Socket clientSocket = serverSocket.accept();
+                        System.out.println("Connected, not reg");
                         synchronized (notRegistered) {
                             var client = new NetClient(clientSocket);
                             notRegistered.add(client);
@@ -132,6 +140,7 @@ public class Server {
                             client.closeEvent.subscribe(this::disconnect);
                             //client.invalidData.subscribe();
                             client.startListen();
+                            System.out.println("Connected, reg" + client.name);
 
                         }
                     } catch (IOException e) {
@@ -142,8 +151,6 @@ public class Server {
             }
         }
     }
-
-
 
     private void process(Object sender, Object data){
         NetClient client = (NetClient) sender;
@@ -299,7 +306,6 @@ public class Server {
         }
 
         return null;
-        //return (Trade) trades.stream().filter(t -> t.getId() == tradeId);
     }
 
     public void broadcast(Serializable message){
@@ -344,5 +350,6 @@ public class Server {
         server.start();
         System.out.println("Ready on port " + port);
         server.waitingToStop();
+
     }
 }

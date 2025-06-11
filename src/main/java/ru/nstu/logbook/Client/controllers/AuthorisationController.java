@@ -1,5 +1,0 @@
-package ru.nstu.logbook.Client.controllers;
-
-public class AuthorisationController {
-
-}

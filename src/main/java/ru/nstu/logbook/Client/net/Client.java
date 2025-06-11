@@ -52,12 +52,10 @@ public class Client {
 
         status = Status.CONNECTING;
 
-
-
         for(var strAddress : SERVER_IPS){
             InetAddress address = InetAddress.getByName(strAddress);
             for(int i = DEFAULT_PORT; i < 8100; i++){
-                System.out.println("Try to connect to " + strAddress + " " + i);
+                System.out.println("Trying to connect to " + strAddress + ", port:" + i);
                 var socket = new Socket();
                 try {
                     socket.connect(new InetSocketAddress(address, i));
@@ -75,7 +73,7 @@ public class Client {
                         return;
                     }
                 } catch (IOException e) {
-                    ;
+                    ;//ignore
                 }
 
             }

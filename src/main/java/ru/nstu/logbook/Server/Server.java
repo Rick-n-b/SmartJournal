@@ -187,8 +187,11 @@ public class Server {
         if(!notRegistered.contains(client))
             return;
         System.out.println("1");
+        synchronized (clients){
             client.id = generateId();
             clients.put(client.id, client);
+        }
+
 
         System.out.println("2" );
         synchronized (notRegistered){
@@ -288,7 +291,6 @@ public class Server {
         var message = new AcceptTradeMessage(trade.getId());
         var issuer = clients.get(trade.getSenderId());
         if(issuer == null) {
-            //client.send(new ClientNotFoundError(trade.getIssuerId()));
             return;
         }
         issuer.send(message);
@@ -310,14 +312,14 @@ public class Server {
             for(var client : clients.values()){
                 client.send(message);
             }
-        }
+       }
 
     }
 
     private Integer generateId(){
         Random random = new Random();
         int id = random.nextInt(100, 10000);
-        while (!clients.containsKey(id)){
+        while (clients.containsKey(id)){
             id = random.nextInt(100, 10000);
         }
         return id;

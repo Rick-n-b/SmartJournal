@@ -113,29 +113,45 @@ public class RemindPageController extends PageController {
 
         deleteButton.setDisable(this.reminder.getTopic().isEmpty() && this.reminder.getContent().isEmpty());
 
-        topicText.textProperty().addListener(topicListener);
-        contentArea.textProperty().addListener(contentListener);
-        remindDate.valueProperty().addListener(dateListener);
-        remindTime.textProperty().addListener(timeListener);
+        addListeners();
 
     }
 
     @FXML
     public void delete(ActionEvent event) {
         deleteButton.setDisable(true);
+        removeListeners();
+        topicText.clear();
+        contentArea.clear();
         RemindStorage.getInstance().delete(reminder);
+        addListeners();
         drawList();
     }
 
     @FXML
     public void back(ActionEvent event){
         drawList();
+
+        removeListeners();
+        remindDate.setValue(LocalDate.now().plusDays(1));
+        remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        topicText.clear();
+        contentArea.clear();
+        stage.setScene(mainScene);
+        mainPageController.drawList();
+    }
+
+    void removeListeners(){
         topicText.textProperty().removeListener(topicListener);
         contentArea.textProperty().removeListener(contentListener);
         remindDate.valueProperty().removeListener(dateListener);
         remindTime.textProperty().removeListener(timeListener);
-        stage.setScene(mainScene);
-        mainPageController.drawList();
+    }
+    void addListeners(){
+        topicText.textProperty().addListener(topicListener);
+        contentArea.textProperty().addListener(contentListener);
+        remindDate.valueProperty().addListener(dateListener);
+        remindTime.textProperty().addListener(timeListener);
     }
 
     @FXML

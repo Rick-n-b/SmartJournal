@@ -39,13 +39,13 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <DatePicker fx:id="dateScroll" layoutX="13.0" layoutY="185.0" />
+            <DatePicker fx:id="dateScrollSince" layoutX="13.0" layoutY="185.0" />
             <Label layoutX="13.0" layoutY="153.0" text="View tasks as scroll since:">
                <font>
                   <Font size="16.0" />
                </font>
             </Label>
-            <Button fx:id="scrollAdmitButton" layoutX="70.0" layoutY="220.0" mnemonicParsing="false" onAction="#scrollShow" text="Admit">
+            <Button fx:id="scrollAcceptButton" layoutX="70.0" layoutY="220.0" mnemonicParsing="false" onAction="#scrollShow" text="Admit">
                <font>
                   <Font size="14.0" />
                </font>

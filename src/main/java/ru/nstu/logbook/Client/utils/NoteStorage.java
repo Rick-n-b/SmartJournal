@@ -64,6 +64,23 @@ public class NoteStorage {
         }
     }
 
+    public void loadPeriod(LocalDate since, LocalDate to) {
+        if(since.isAfter(to))
+            return;
+
+        notes.clear();
+        var local = since;
+
+        do{
+            NoteStorage.getInstance().load(local);
+            Note loaded = load(local);
+            if (loaded != null) {
+                notes.put(local, loaded);
+            }
+            local = local.plusDays(1);
+        }while(!local.isAfter(to));
+    }
+
     public Note load(LocalDate date) {
 
         var notesDir = new File(path, NOTE_DIRECTORY);

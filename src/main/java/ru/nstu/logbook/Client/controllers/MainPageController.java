@@ -92,14 +92,7 @@ public class MainPageController extends PageController {
         }
     }
 
-    void showNote(LocalDate noteDate, Note note){
-        if(note == null){
-            note = new Note();
-            note.setDate(noteDate);
-        }
-        notePageController.setNote(note);
-        stage.setScene(notePageScene);
-    }
+
 
 
     @FXML

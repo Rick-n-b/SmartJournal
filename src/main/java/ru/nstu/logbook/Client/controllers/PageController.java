@@ -1,7 +1,5 @@
 package ru.nstu.logbook.Client.controllers;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,7 +17,6 @@ import ru.nstu.logbook.Client.notes.Reminder;
 import ru.nstu.logbook.Client.utils.NoteStorage;
 import ru.nstu.logbook.Client.utils.RemindStorage;
 
-import java.text.Format;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -32,7 +29,10 @@ public class PageController {
     public Label authorizedName;
 
     @FXML
-    public DatePicker dateScroll;
+    public DatePicker scrollDateSince;
+
+    @FXML
+    public DatePicker scrollDateTo;
 
     @FXML
     public AnchorPane menuPane;
@@ -50,11 +50,12 @@ public class PageController {
     public ListView<Reminder> remindsList;
 
     @FXML
-    public Button scrollAdmitButton;
+    public Button scrollAcceptButton;
 
 
     LocalDate current = LocalDate.now();
     LocalDate calendarDate = LocalDate.now();
+
     NoteStorage noteStorage = NoteStorage.getInstance();
     RemindStorage remindStorage = RemindStorage.getInstance();
 
@@ -72,6 +73,9 @@ public class PageController {
 
     public Scene plansPageScene;
     public PlansPageController plansPageController;
+
+    public Scene scrollPageScene;
+    public ScrollPageController scrollPageController;
 
 
     @FXML
@@ -97,7 +101,27 @@ public class PageController {
 
     @FXML
     public void scrollShow(ActionEvent event) {
+        if(scrollDateSince.getValue() != null && scrollDateTo.getValue() == null){
+            if(!scrollDateSince.getValue().isAfter(current)){
+                scrollPageController.setDates(scrollDateSince.getValue(), current);
+                stage.setScene(scrollPageScene);
+            }
+        }else if(scrollDateSince.getValue() != null && scrollDateTo.getValue() != null){
+            if(!scrollDateSince.getValue().isAfter(scrollDateTo.getValue()))
+            {
+                scrollPageController.setDates(scrollDateSince.getValue(), scrollDateTo.getValue());
+                stage.setScene(scrollPageScene);
+            }
+        }
+    }
 
+    public void showNote(LocalDate noteDate, Note note){
+        if(note == null){
+            note = new Note();
+            note.setDate(noteDate);
+        }
+        notePageController.setNote(note);
+        stage.setScene(notePageScene);
     }
 
     public void save(Reminder reminder) {
@@ -123,7 +147,7 @@ public class PageController {
 
     @FXML
     public void delete(ActionEvent event) {
-
+        drawList();
     }
 
     public void drawList() {
@@ -170,6 +194,7 @@ public class PageController {
                             }
                         }
                     });
+                    setWrapText(true);
                     setText(reminder.getExpirationDate().toString() + " " +
                             reminder.getExpirationTime().format(DateTimeFormatter.ofPattern("H:m")) + " " +
                             reminder.getTopic());
@@ -196,7 +221,9 @@ public class PageController {
                      Scene remindPageScene,
                      RemindPageController remindPageController,
                      Scene plansPageScene,
-                     PlansPageController plansPageController)
+                     PlansPageController plansPageController,
+                     Scene scrollPageScene,
+                     ScrollPageController scrollPageController)
     {
         this.stage = stage;
         this.client = client;
@@ -209,13 +236,29 @@ public class PageController {
         this.remindPageController = remindPageController;
         this.plansPageScene = plansPageScene;
         this.plansPageController = plansPageController;
+        this.scrollPageScene = scrollPageScene;
+        this.scrollPageController = scrollPageController;
+
+        if(this != mainPageController){
+            scrollDateTo.valueProperty().bindBidirectional(mainPageController.scrollDateTo.valueProperty());
+            scrollDateSince.valueProperty().bindBidirectional(mainPageController.scrollDateSince.valueProperty());
+        }
+
+
+
 
         remindsList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         remindsList.setCellFactory(this::createList);
-        remindsList.getSelectionModel().selectedItemProperty().addListener(
-                e -> showReminder(remindsList.getSelectionModel().getSelectedItem()));
-        remindsList.setTooltip(new Tooltip("Double click to create reminder"));
 
+        remindsList.setTooltip(new Tooltip("Double click to create reminder"));
+        remindsList.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getButton() == MouseButton.PRIMARY)
+                    if(event.getClickCount() == 2)
+                        showReminder(null);
+            }
+        });
         add.setOnAction(e -> {
             showReminder(null);
         });
@@ -238,5 +281,8 @@ public class PageController {
         remindsList.setContextMenu(listCM);
         drawList();
 
+
+        //scrollDateSince.setValue(LocalDate.now().minusDays(7));
+        //scrollDateTo.setValue(LocalDate.now().plusDays(7));
     }
 }

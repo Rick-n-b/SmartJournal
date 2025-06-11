@@ -7,10 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import ru.nstu.logbook.Client.controllers.MainPageController;
-import ru.nstu.logbook.Client.controllers.NotePageController;
-import ru.nstu.logbook.Client.controllers.PlansPageController;
-import ru.nstu.logbook.Client.controllers.RemindPageController;
+import ru.nstu.logbook.Client.controllers.*;
 import ru.nstu.logbook.Client.net.Client;
 import ru.nstu.logbook.Client.utils.NoteStorage;
 
@@ -41,40 +38,53 @@ public class App extends Application {
         var plansPageScene = new Scene(fxmlPlansPageLoader.load());
         var plansPageController = (PlansPageController) fxmlPlansPageLoader.getController();
 
+        FXMLLoader fxmlScrollPageLoader = new FXMLLoader(App.class.getResource("ScrollPage.fxml"));
+        var scrollPageScene = new Scene(fxmlScrollPageLoader.load());
+        var scrollPageController = (ScrollPageController) fxmlScrollPageLoader.getController();
+
         notePageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
-                plansPageScene, plansPageController);
+                plansPageScene, plansPageController,
+                scrollPageScene, scrollPageController);
 
         remindPageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
-                plansPageScene, plansPageController);
+                plansPageScene, plansPageController,
+                scrollPageScene, scrollPageController);
 
         mainController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
-                plansPageScene, plansPageController);
+                plansPageScene, plansPageController,
+                scrollPageScene, scrollPageController);
 
         plansPageController.init(stage, client,
                 mainScene, mainController,
                 notePageScene, notePageController,
                 remindPageScene, remindPageController,
-                plansPageScene, plansPageController);
+                plansPageScene, plansPageController,
+                scrollPageScene, scrollPageController);
+
+        scrollPageController.init(stage, client,
+                mainScene, mainController,
+                notePageScene, notePageController,
+                remindPageScene, remindPageController,
+                plansPageScene, plansPageController,
+                scrollPageScene, scrollPageController);
 
         stage.show();
 
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent windowEvent) {
+        stage.setOnCloseRequest(e-> {
                 NoteStorage.getInstance().saveConf();
                 Platform.exit();
                 System.exit(0);
             }
-        });
+        );
     }
 
     public static void main(String[] args) {

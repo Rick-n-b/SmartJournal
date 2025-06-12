@@ -9,6 +9,7 @@ import javafx.stage.Stage;
 import ru.nstu.logbook.controllers.*;
 import ru.nstu.logbook.net.DBManager;
 import ru.nstu.logbook.utils.NoteStorage;
+import ru.nstu.logbook.utils.RemindStorage;
 
 import java.io.IOException;
 
@@ -113,6 +114,7 @@ public class App extends Application {
 
         stage.setOnCloseRequest(e-> {
                 NoteStorage.getInstance().saveConf();
+                RemindStorage.getInstance().saveConf();
                 Platform.exit();
                 System.exit(0);
                 DBManager.closeConnection();

@@ -12,11 +12,15 @@ public class Reminder implements Serializable {
     String topic;
     String content;
 
+    public Reminder(LocalDate date, LocalTime time, String topic, String content){
+        this.expirationDate = date;
+        this.expirationTime = time;
+        this.topic = topic;
+        this.content = content;
+    }
+
     public Reminder(){
-        this.expirationDate = LocalDate.now();
-        this.expirationTime = LocalTime.now();
-        this.topic = "";
-        this.content = "";
+        this(LocalDate.now(), LocalTime.now(), "", "");
     }
 
     public void setTopic(String topic) {

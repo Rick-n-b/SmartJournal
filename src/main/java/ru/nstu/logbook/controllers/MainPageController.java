@@ -103,5 +103,6 @@ public class MainPageController extends PageController {
         calendar.setAlignment(Pos.CENTER);
         drawCalendar();
         noteStorage.loadConf();
+        remindStorage.loadConf();
     }
 }

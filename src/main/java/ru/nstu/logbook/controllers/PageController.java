@@ -11,6 +11,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import ru.nstu.logbook.net.User;
 import ru.nstu.logbook.notes.Note;
 import ru.nstu.logbook.notes.Reminder;
 import ru.nstu.logbook.utils.NoteStorage;
@@ -80,13 +81,20 @@ public class PageController {
     public Scene regPageScene;
     public RegistrationPageController registrationPageController;
 
-    private static int userId = -1;
+    private static User user;
 
-    public int getUserId(){
-        return userId;
+    public static String plan = "";
+
+    public static int getUserId(){
+        return user.id;
     }
-    public static void setUserId(int userId1){
-        userId = userId1;
+
+    public static void setUserId(int userId){
+        user.id = userId;
+    }
+
+    public static void setUserName(String name){
+        user.name = name;
     }
 
     @FXML
@@ -281,6 +289,10 @@ public class PageController {
                     if(event.getClickCount() == 2)
                         showReminder(null);
             }
+        });
+
+        authorizedName.textProperty().addListener(e -> {
+            authorizedName.textProperty().setValue(user.name);
         });
 
         listAdd.setOnAction(e -> {

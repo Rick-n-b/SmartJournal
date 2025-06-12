@@ -9,8 +9,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import ru.nstu.logbook.net.DBManager;
+import ru.nstu.logbook.notes.Reminder;
+import ru.nstu.logbook.utils.NoteStorage;
+import ru.nstu.logbook.utils.RemindStorage;
 
 import java.sql.SQLException;
+
+import static ru.nstu.logbook.controllers.PageController.plan;
 
 public class RegistrationPageController {
 
@@ -50,6 +55,14 @@ public class RegistrationPageController {
                     PageController.setUserId(DBManager.registerUser(username, pass));
                     messageLabel.setVisible(true);
                     messageLabel.setText("User registered successfully");
+                    for(var note : NoteStorage.getInstance().notes.values()){
+                        DBManager.addNoteForUser(PageController.getUserId(), note);
+                    }
+                    for(var remind : RemindStorage.getInstance().reminds){
+                        DBManager.addReminderForUser(PageController.getUserId(), remind);
+                    }
+                    DBManager.addPlanForUser(PageController.getUserId(), plan);
+
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

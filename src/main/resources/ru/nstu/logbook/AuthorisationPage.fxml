@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="300.0" maxWidth="600.0" minHeight="251.0" minWidth="409.0" prefHeight="251.0" prefWidth="409.0" xmlns="http://javafx.com/javafx/21.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nstu.logbook.controllers.AuthorisationPageController">
    <children>
-      <Button fx:id="cancelButton" layoutX="70.0" layoutY="155.0" mnemonicParsing="false" onAction="#cancel" text="Cancel">
+      <Button fx:id="cancelButton" layoutX="70.0" layoutY="155.0" mnemonicParsing="false" onAction="#cancel" prefHeight="40.0" prefWidth="100.0" text="Cancel">
          <font>
             <Font size="16.0" />
          </font>
@@ -34,12 +34,12 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <Button fx:id="authButton" layoutX="250.0" layoutY="155.0" mnemonicParsing="false" onAction="#auth" text="Authorize">
+      <Button fx:id="authButton" layoutX="239.0" layoutY="155.0" mnemonicParsing="false" onAction="#auth" prefHeight="40.0" prefWidth="100.0" text="Authorize">
          <font>
             <Font size="16.0" />
          </font>
       </Button>
-      <Label fx:id="messageLabel" alignment="CENTER" layoutX="109.0" layoutY="27.0" prefHeight="25.0" prefWidth="192.0" text="Message" textAlignment="CENTER" visible="false">
+      <Label fx:id="messageLabel" alignment="CENTER" layoutX="42.0" layoutY="21.0" prefHeight="26.0" prefWidth="325.0" text="Message" textAlignment="CENTER" visible="false">
          <font>
             <Font size="16.0" />
          </font>

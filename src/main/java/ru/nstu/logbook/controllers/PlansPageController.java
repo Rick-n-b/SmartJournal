@@ -1,9 +1,11 @@
 package ru.nstu.logbook.controllers;
 
 import java.io.*;
+import java.sql.SQLException;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import ru.nstu.logbook.net.DBManager;
 
 public class PlansPageController extends PageController{
 
@@ -13,7 +15,6 @@ public class PlansPageController extends PageController{
     Label date;
 
     String path = "./src/main/resources/ru/nstu/logbook/";
-    String plan;
     File file = new File(path, "plans.bin");
 
     public void save(){
@@ -51,6 +52,14 @@ public class PlansPageController extends PageController{
         contentArea.setWrapText(true);
         contentArea.textProperty().addListener(e ->{
                 plan = contentArea.getText();
+                if(PageController.getUserId() != -1){
+                    try {
+                        DBManager.deletePlanForUser(PageController.getUserId());
+                        DBManager.addPlanForUser(PageController.getUserId(), plan);
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
                 save();
         });
     }

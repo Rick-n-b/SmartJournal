@@ -7,19 +7,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="300.0" maxWidth="600.0" minHeight="251.0" minWidth="409.0" prefHeight="251.0" prefWidth="409.0" xmlns="http://javafx.com/javafx/21.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nstu.logbook.controllers.RegistrationPageController">
+<AnchorPane maxHeight="300.0" maxWidth="600.0" minHeight="251.0" minWidth="409.0" prefHeight="282.0" prefWidth="409.0" xmlns="http://javafx.com/javafx/21.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.nstu.logbook.controllers.RegistrationPageController">
    <children>
-      <Button fx:id="cancelButton" layoutX="68.0" layoutY="194.0" mnemonicParsing="false" onAction="#cancel" text="Cancel">
+      <Button fx:id="cancelButton" layoutX="69.0" layoutY="194.0" mnemonicParsing="false" onAction="#cancel" prefHeight="40.0" prefWidth="100.0" text="Cancel">
          <font>
             <Font size="16.0" />
          </font>
       </Button>
-      <TextField fx:id="nick" layoutX="159.0" layoutY="60.0" prefHeight="25.0" prefWidth="177.0">
+      <TextField fx:id="nick" layoutX="160.0" layoutY="60.0" prefHeight="25.0" prefWidth="180.0">
          <font>
             <Font size="14.0" />
          </font>
       </TextField>
-      <PasswordField fx:id="password" layoutX="159.0" layoutY="101.0" prefHeight="25.0" prefWidth="177.0">
+      <PasswordField fx:id="password" layoutX="160.0" layoutY="101.0" prefHeight="25.0" prefWidth="180.0">
          <font>
             <Font size="14.0" />
          </font>
@@ -34,12 +34,12 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <Button fx:id="regButton" layoutX="249.0" layoutY="194.0" mnemonicParsing="false" onAction="#reg" text="Registrate">
+      <Button fx:id="regButton" layoutX="240.0" layoutY="194.0" mnemonicParsing="false" onAction="#reg" prefHeight="40.0" prefWidth="100.0" text="Registrate">
          <font>
             <Font size="16.0" />
          </font>
       </Button>
-      <PasswordField fx:id="repeatedPassword" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="177.0">
+      <PasswordField fx:id="repeatedPassword" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="180.0">
          <font>
             <Font size="14.0" />
          </font>
@@ -49,7 +49,7 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <Label fx:id="messageLabel" alignment="CENTER" layoutX="118.0" layoutY="22.0" prefHeight="25.0" prefWidth="169.0" text="Message" textAlignment="CENTER" visible="false" wrapText="true">
+      <Label fx:id="messageLabel" alignment="CENTER" layoutX="39.0" layoutY="21.0" prefHeight="26.0" prefWidth="330.0" text="Message" textAlignment="CENTER" visible="false" wrapText="true">
          <font>
             <Font size="16.0" />
          </font>

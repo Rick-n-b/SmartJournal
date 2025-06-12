@@ -48,6 +48,10 @@ public class App extends Application {
         var regPageScene = new Scene(fxmlRegPageLoader.load());
         var registrationPageController = (RegistrationPageController) fxmlRegPageLoader.getController();
 
+        FXMLLoader fxmlAskPageLoader = new FXMLLoader(App.class.getResource("AskPage.fxml"));
+        var askPageScene = new Scene(fxmlAskPageLoader.load());
+        var askPageController = (AskPageController) fxmlAskPageLoader.getController();
+
         notePageController.init(stage,
                 mainScene, mainController,
                 notePageScene, notePageController,
@@ -103,12 +107,16 @@ public class App extends Application {
 
         authPageController.init(authStage,
                 mainScene, mainController,
-                authPageScene, authPageController);
+                authPageScene, authPageController,
+                askPageScene, askPageController);
 
-        registrationPageController.init(authStage,
+        registrationPageController.init(regStage,
                 mainScene, mainController,
                 regPageScene, registrationPageController);
 
+        askPageController.init(authStage,
+                mainScene, mainController,
+                authPageScene, authPageController);
 
         stage.show();
 

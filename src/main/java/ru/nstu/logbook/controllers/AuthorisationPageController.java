@@ -33,6 +33,9 @@ public class AuthorisationPageController {
     Scene authPageScene;
     AuthorisationPageController authPageController;
 
+    Scene askScene;
+    AskPageController askPageController;
+
     @FXML
     public void auth(ActionEvent event) {
         String username = nick.getText();
@@ -43,6 +46,7 @@ public class AuthorisationPageController {
                 PageController.setUserId(userId);
                 messageLabel.setVisible(true);
                 messageLabel.setText("Authorized successfully");
+                stage.setScene(askScene);
             } else {
                 messageLabel.setVisible(true);
                 messageLabel.setText("Incorrect username or password.");
@@ -63,13 +67,17 @@ public class AuthorisationPageController {
 
     public void init(Stage stage,
                      Scene mainScene, MainPageController mainController,
-                     Scene authPageScene, AuthorisationPageController authPageController)
+                     Scene authPageScene, AuthorisationPageController authPageController,
+                     Scene askScene, AskPageController askPageController)
     {
         this.stage = stage;
         this.mainScene = mainScene;
         this.mainController = mainController;
         this.authPageScene = authPageScene;
         this.authPageController = authPageController;
+        this.askScene = askScene;
+        this.askPageController = askPageController;
+
         stage.setScene(authPageScene);
         stage.setResizable(false);
         stage.setTitle("Authorization");

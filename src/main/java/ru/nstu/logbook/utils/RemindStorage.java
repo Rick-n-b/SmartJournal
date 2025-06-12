@@ -1,10 +1,13 @@
 package ru.nstu.logbook.utils;
 
+import ru.nstu.logbook.controllers.PageController;
+import ru.nstu.logbook.net.DBManager;
 import ru.nstu.logbook.notes.Reminder;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -61,19 +64,6 @@ public class RemindStorage {
         }
     }
 
-    public Reminder load(LocalDate date, String topic) {
-
-        var dir = new File(path, NOTE_DIRECTORY);
-        var file = new File(dir, date.toString() + SAVE_EXTENSION);
-        if (file.exists()) {
-            for(var rem : load(date)){
-                if(rem.getTopic().equals(topic))
-                    return rem;
-            }
-        }
-        return null;
-    }
-
     public ArrayList<Reminder> load(LocalDate date) {
 
         var dir = new File(path, NOTE_DIRECTORY);
@@ -110,6 +100,13 @@ public class RemindStorage {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        if(PageController.getUserId() != -1){
+            try {
+                DBManager.addReminderForUser(PageController.getUserId(),  reminder);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
     }
 
@@ -117,6 +114,13 @@ public class RemindStorage {
         var dir = new File(path, NOTE_DIRECTORY);
         var file = new File(dir, reminder.getExpirationDate().toString() + SAVE_EXTENSION);
         reminds.remove(reminder);
+        if(PageController.getUserId() != -1){
+            try {
+                DBManager.deleteReminderForUser(PageController.getUserId(),  reminder);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         ArrayList<Reminder> reminders = load(reminder.getExpirationDate());
         try {
             if(reminders != null){
@@ -127,7 +131,6 @@ public class RemindStorage {
                             rem.getExpirationDate().toString().equals(reminder.getExpirationDate().toString())
                     ){
                         reminders.remove(rem);
-                        reminds.remove(rem);
                         if (reminders.isEmpty())
                             return Files.deleteIfExists(Path.of(file.getPath()));
                         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file))) {
@@ -160,13 +163,12 @@ public class RemindStorage {
             }
     }
 
-    public void loadAll(){
+    public ArrayList<Reminder> loadAll(){
         var dir = new File(path, NOTE_DIRECTORY);
         File[] files = dir.listFiles();
 
         ArrayList<Reminder> allTheRems = new ArrayList<>();
         if(dir.exists()){
-            reminds.clear();
             for (var file : files) {
                 try (var in = new ObjectInputStream(new FileInputStream(file))) {
                     if(file.getName().matches("YYYY-mm-dd"))
@@ -176,7 +178,9 @@ public class RemindStorage {
                 }
             }
         }
+        return allTheRems;
     }
+
     public void saveAll(){
         for(var rem : reminds){
             save(rem);

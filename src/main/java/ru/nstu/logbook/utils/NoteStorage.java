@@ -1,11 +1,16 @@
 package ru.nstu.logbook.utils;
 
+import ru.nstu.logbook.controllers.PageController;
+import ru.nstu.logbook.net.DBManager;
 import ru.nstu.logbook.notes.Note;
+import ru.nstu.logbook.notes.Reminder;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -97,6 +102,37 @@ public class NoteStorage {
         return null;
     }
 
+    public void deleteAll(){
+        var dir = new File(path, NOTE_DIRECTORY);
+        File[] files = dir.listFiles();
+        if(dir.exists())
+            for (var file : files) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+    }
+
+    public Map<LocalDate, Note> loadAll(){
+        var dir = new File(path, NOTE_DIRECTORY);
+        File[] files = dir.listFiles();
+
+        Map<LocalDate, Note> allTheNotes = new HashMap<>();
+        if(dir.exists()){
+            for (var file : files) {
+                try (var in = new ObjectInputStream(new FileInputStream(file))) {
+                    if(file.getName().matches("YYYY-mm-dd")){
+                        Note note = (Note) in.readObject();
+                        allTheNotes.put(note.getDate(), note);
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        return allTheNotes;
+    }
+
     public void save(Note note) {
         var notesDir = new File(path, NOTE_DIRECTORY);
         var noteFile = new File(notesDir, note.getDate().toString() + SAVE_EXTENSION);
@@ -117,11 +153,34 @@ public class NoteStorage {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        if(PageController.getUserId() != -1){
+            try {
+                DBManager.deleteNoteForUser(PageController.getUserId(), note.getDate());
+                DBManager.addNoteForUser(PageController.getUserId(), note);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void saveAll(){
+        for(var note : notes.values()){
+            save(note);
+        }
     }
 
     public boolean delete(Note note) {
         var notesDir = new File(path, NOTE_DIRECTORY);
         var noteFile = new File(notesDir, note.getDate().toString() + SAVE_EXTENSION);
+
+        if(PageController.getUserId() != -1){
+            try {
+                DBManager.deleteNoteForUser(PageController.getUserId(), note.getDate());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         try {
             return Files.deleteIfExists(Path.of(noteFile.getPath()));
         } catch (IOException e) {

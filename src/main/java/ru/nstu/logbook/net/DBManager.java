@@ -154,6 +154,16 @@ public class DBManager {
         }
     }
 
+    public static void deleteAllNoteForUser(int userId) throws SQLException {
+        String sql = "DELETE FROM notes WHERE user_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+
+            statement.executeUpdate();
+        }
+    }
+
     public static Map<LocalDate, Note> getNotesForUser(int userId) throws SQLException {
         Map<LocalDate, Note> notes = new HashMap<>();
         String sql = "SELECT * FROM notes WHERE user_id = ?";
@@ -196,9 +206,9 @@ public class DBManager {
     }
 
     public static void addReminderForUser(int userId, Reminder reminder) throws SQLException {
-        String query = "INSERT INTO reminds (user_id, date, time, topic, inners) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO reminds (user_id, date, time, topic, inners) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             statement.setDate(2, Date.valueOf(reminder.getExpirationDate()));
             statement.setTime(3, Time.valueOf(reminder.getExpirationTime()));
@@ -217,6 +227,16 @@ public class DBManager {
             statement.setTime(3, Time.valueOf(reminder.getExpirationTime()));
             statement.setString(4, reminder.getTopic());
             statement.setString(5, reminder.getContent());
+
+            statement.executeUpdate();
+        }
+    }
+
+    public static void deleteAllReminderForUser(int userId) throws SQLException {
+        String sql = "DELETE FROM reminds WHERE user_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
 
             statement.executeUpdate();
         }
@@ -248,11 +268,12 @@ public class DBManager {
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, userId);
+            statement.setString(2, plan);
             statement.executeUpdate();
         }
     }
 
-    public static void deletePlanForUser(int userId, LocalDate date) throws SQLException {
+    public static void deletePlanForUser(int userId) throws SQLException {
         String sql = "DELETE FROM bigplans WHERE user_id = ?";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -268,7 +289,7 @@ public class DBManager {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
-                resultSet.next();//??
+                resultSet.next();
                 plan = resultSet.getString("inners");
             }
         }

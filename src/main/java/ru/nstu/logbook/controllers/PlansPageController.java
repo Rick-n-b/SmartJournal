@@ -61,8 +61,5 @@ public class PlansPageController extends PageController{
                 save();
             }
         }  );
-
-
     }
-
 }

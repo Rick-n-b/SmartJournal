@@ -3,6 +3,9 @@ package ru.nstu.logbook.controllers;
 import java.io.*;
 import java.sql.SQLException;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import ru.nstu.logbook.net.DBManager;
@@ -29,20 +32,21 @@ public class PlansPageController extends PageController{
     }
 
     @FXML
-    void initialize(){
+    void initialize() {
         date.setText(current.toString());
-        if(!file.exists()) {
+        if (!file.exists()) {
             try {
                 file.createNewFile();
+                DBManager.addPlanForUser(PageController.getUserId(), plan);
                 save();
-            } catch (IOException e) {
+            } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
             }
             plan = "";
-        }else{
+        } else {
             try (var in = new ObjectInputStream(new FileInputStream(file))) {
-                 plan = (String) in.readObject();
-                 contentArea.setText(plan);
+                plan = (String) in.readObject();
+                contentArea.setText(plan);
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -50,18 +54,15 @@ public class PlansPageController extends PageController{
         deleteButton.setDisable(true);
         deleteButton.setVisible(false);
         contentArea.setWrapText(true);
-        contentArea.textProperty().addListener(e ->{
-                plan = contentArea.getText();
-                if(PageController.getUserId() != -1){
-                    try {
-                        DBManager.deletePlanForUser(PageController.getUserId());
-                        DBManager.addPlanForUser(PageController.getUserId(), plan);
-                    } catch (SQLException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
+        contentArea.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observableValue, String oldValue, String newValue) {
+                plan = newValue;
                 save();
-        });
+            }
+        }  );
+
+
     }
 
 }

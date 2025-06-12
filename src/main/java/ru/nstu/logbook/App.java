@@ -18,7 +18,7 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("MainPage.fxml"));
         Scene mainScene = new Scene(fxmlLoader.load());
-        stage.setTitle("One idiot's logbook");
+        stage.setTitle("One logbook");
         stage.setScene(mainScene);
         stage.setResizable(false);
 
@@ -123,7 +123,6 @@ public class App extends Application {
         stage.setOnCloseRequest(e-> {
                 NoteStorage.getInstance().saveConf();
                 RemindStorage.getInstance().saveConf();
-                mainController.updateThread.interrupt();
                 Platform.exit();
                 System.exit(0);
                 DBManager.closeConnection();

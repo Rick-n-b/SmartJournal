@@ -143,6 +143,18 @@ public class DBManager {
         }
     }
 
+    public static void updateNoteForUser(int userId, Note note) throws SQLException {
+        String sql = "UPDATE notes SET topic = ?, inners = ? WHERE user_id = ? AND date = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, note.getTopic());
+            statement.setString(2, note.getContent());
+            statement.setInt(3, userId);
+            statement.setDate(4, Date.valueOf(note.getDate()));
+            statement.executeUpdate();
+        }
+    }
+
     public static void deleteNoteForUser(int userId, LocalDate date) throws SQLException {
         String sql = "DELETE FROM notes WHERE user_id = ? AND date = ?";
         try (Connection connection = getConnection();
@@ -184,8 +196,8 @@ public class DBManager {
 
     //напоминания
 
-    public static ArrayList<Reminder> getRemindsForPeriod(int userId, LocalDate startDate, LocalDate endDate) throws SQLException {
-        ArrayList<Reminder> reminders = new ArrayList<>();
+    public static Map<Integer, Reminder> getRemindsForPeriod(int userId, LocalDate startDate, LocalDate endDate) throws SQLException {
+        Map<Integer, Reminder> reminders = new HashMap<>();
         String query = "SELECT * FROM reminds WHERE user_id = ? AND date BETWEEN ? AND ? ORDER BY date";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -194,39 +206,52 @@ public class DBManager {
             statement.setDate(3, Date.valueOf(endDate));
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
+                int id = resultSet.getInt("remind_id");
                 LocalDate date = resultSet.getDate("date").toLocalDate();
                 LocalTime time = resultSet.getTime("time").toLocalTime();
                 String topic = resultSet.getString("topic");
                 String content = resultSet.getString("inners");
 
-                reminders.add(new Reminder(date, time, topic, content));
+                reminders.put(id, new Reminder(id, date, time, topic, content));
             }
         }
         return reminders;
     }
 
     public static void addReminderForUser(int userId, Reminder reminder) throws SQLException {
-        String sql = "INSERT INTO reminds (user_id, date, time, topic, inners) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reminds (user_id, remind_id, date, time, topic, inners) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
-            statement.setDate(2, Date.valueOf(reminder.getExpirationDate()));
-            statement.setTime(3, Time.valueOf(reminder.getExpirationTime()));
-            statement.setString(4, reminder.getTopic());
-            statement.setString(5, reminder.getContent());
+            statement.setInt(2, reminder.getId());
+            statement.setDate(3, Date.valueOf(reminder.getExpirationDate()));
+            statement.setTime(4, Time.valueOf(reminder.getExpirationTime()));
+            statement.setString(5, reminder.getTopic());
+            statement.setString(6, reminder.getContent());
+            statement.executeUpdate();
+        }
+    }
+
+    public static void updateRemindForUser(int userId, Reminder reminder) throws SQLException {
+        String sql = "UPDATE reminds SET date = ?, time = ?, topic = ?, inners = ? WHERE user_id = ? AND remind_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setDate(1, Date.valueOf(reminder.getExpirationDate()));
+            statement.setTime(2, Time.valueOf(reminder.getExpirationTime()));
+            statement.setString(3, reminder.getTopic());
+            statement.setString(4, reminder.getContent());
+            statement.setInt(5, userId);
+
             statement.executeUpdate();
         }
     }
 
     public static void deleteReminderForUser(int userId, Reminder reminder) throws SQLException {
-        String sql = "DELETE FROM reminds WHERE user_id = ? AND date = ? AND time = ? AND topic = ? AND inners = ?";
+        String sql = "DELETE FROM reminds WHERE user_id = ? AND id = ?";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
-            statement.setDate(2, Date.valueOf(reminder.getExpirationDate()));
-            statement.setTime(3, Time.valueOf(reminder.getExpirationTime()));
-            statement.setString(4, reminder.getTopic());
-            statement.setString(5, reminder.getContent());
+            statement.setInt(2, reminder.getId());
 
             statement.executeUpdate();
         }
@@ -242,19 +267,20 @@ public class DBManager {
         }
     }
 
-    public static ArrayList<Reminder> getRemindsForUser(int userId) throws SQLException {
-        ArrayList<Reminder> reminders = new ArrayList<>();
+    public static Map<Integer, Reminder> getRemindsForUser(int userId) throws SQLException {
+        Map<Integer, Reminder> reminders = new HashMap<>();
         String sql = "SELECT * FROM reminds WHERE user_id = ?";
         try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, userId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
+                    int id = resultSet.getInt("remind_id");
                     LocalDate date = resultSet.getDate("date").toLocalDate();
                     LocalTime time = resultSet.getTime("time").toLocalTime();
                     String topic = resultSet.getString("topic");
                     String content = resultSet.getString("inners");
-                    reminders.add(new Reminder(date, time, topic, content));
+                    reminders.put(id, new Reminder(id, date, time, topic, content));
                 }
             }
         }
@@ -269,6 +295,16 @@ public class DBManager {
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, userId);
             statement.setString(2, plan);
+            statement.executeUpdate();
+        }
+    }
+
+    public static void updatePlanForUser(int userId, String plan) throws SQLException {
+        String sql = "UPDATE bigplans SET inners = ? WHERE user_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(2, userId);
+            statement.setString(1, plan);
             statement.executeUpdate();
         }
     }

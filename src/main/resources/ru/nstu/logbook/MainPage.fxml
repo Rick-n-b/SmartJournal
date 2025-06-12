@@ -53,12 +53,12 @@
                   </font>
               </Button>
               <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" prefHeight="249.0" prefWidth="178.0" />
-              <Button fx:id="backButton" visible="false" layoutX="13.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Back" >
+              <Button fx:id="backButton" layoutX="13.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Back" visible="false">
                   <font>
                       <Font size="14.0" />
                   </font>
               </Button>
-              <Button fx:id="deleteButton" visible="false" layoutX="133.0" layoutY="557.0" mnemonicParsing="false" onAction="#delete" text="Delete" >
+              <Button fx:id="deleteButton" layoutX="133.0" layoutY="557.0" mnemonicParsing="false" onAction="#delete" text="Delete" visible="false">
                   <font>
                       <Font size="14.0" />
                   </font>
@@ -107,6 +107,11 @@
                       <RowConstraints maxHeight="70.0" minHeight="70.0" prefHeight="70.0" valignment="CENTER" vgrow="SOMETIMES" />
                     </rowConstraints>
                   </GridPane>
+                  <Button fx:id="pushButton" layoutX="281.0" layoutY="35.0" mnemonicParsing="false" onAction="#push" text="Push Updates to cloud">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
                </children>
             </AnchorPane>
         </content>

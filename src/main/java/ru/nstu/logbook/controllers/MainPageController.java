@@ -31,6 +31,9 @@ public class MainPageController extends PageController {
     private Button nextMonthButton;
 
     @FXML
+    public Button pushButton;
+
+    @FXML
     private Button prevMonthButton;
 
     @FXML
@@ -54,38 +57,19 @@ public class MainPageController extends PageController {
         drawCalendar();
     }
 
-    public final Thread updateThread = new Thread(this::update);
-
-    public void update() {
+    @FXML
+    void push(ActionEvent event){
         try {
-            while (true) {
-                if (PageController.getUserId() == -1) {
-                            synchronized (updateThread) {
-                                try {
-                                    updateThread.wait();
-                                } catch (InterruptedException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                } else {
-                    NoteStorage.getInstance().notes.putAll(DBManager.getNotesForUser(PageController.getUserId()));
-                    NoteStorage.getInstance().saveAll();
+        synchronized (noteStorage.notes){
+            for(var note : noteStorage.loadAll().values())
+                DBManager.updateNoteForUser(PageController.getUserId(), note);
 
-                    RemindStorage.getInstance().reminds.addAll(DBManager.getRemindsForUser(PageController.getUserId()));
-                    RemindStorage.getInstance().saveAll();
-                    PageController.plan = DBManager.getPlanForUser(PageController.getUserId());
-                    drawList();
-                    drawCalendar();
-
-                    synchronized (updateThread) {
-                        try {
-                            Thread.sleep(5000);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    }
-                }
-            }
+        }
+        synchronized (remindStorage.reminds){
+            for(var remind : remindStorage.loadAll().values())
+                DBManager.updateRemindForUser(PageController.getUserId(), remind);
+        }
+        DBManager.updatePlanForUser(PageController.getUserId(), PageController.plan);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -146,6 +130,8 @@ public class MainPageController extends PageController {
         drawCalendar();
         noteStorage.loadConf();
         remindStorage.loadConf();
-        updateThread.start();
+
+        pushButton.setVisible(false);
+
     }
 }

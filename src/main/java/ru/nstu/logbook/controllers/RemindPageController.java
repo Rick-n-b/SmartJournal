@@ -7,9 +7,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import ru.nstu.logbook.net.DBManager;
 import ru.nstu.logbook.notes.Reminder;
 import ru.nstu.logbook.utils.RemindStorage;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -44,11 +46,13 @@ public class RemindPageController extends PageController {
             }
 
             reminder.setTopic(newValue);
+            RemindStorage.getInstance().reminds.put(reminder.getId(), reminder);
             save(reminder);
             drawList();
 
         }
     };
+
     ChangeListener<String> contentListener =  new ChangeListener<String>() {
         @Override
         public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
@@ -60,24 +64,24 @@ public class RemindPageController extends PageController {
                 RemindStorage.getInstance().delete(oldReminder);
             }
             reminder.setContent(newValue);
+            RemindStorage.getInstance().reminds.put(reminder.getId(), reminder);
             save(reminder);
             drawList();
-
-
         }
     };
+
     ChangeListener<LocalDate> dateListener = new ChangeListener<LocalDate>() {
         @Override
         public void changed(final ObservableValue<? extends LocalDate> observable, final LocalDate oldValue, final LocalDate newValue) {
-
             deleteButton.setDisable(false);
             if(oldValue != null) {
                 Reminder oldReminder = reminder;
                 oldReminder.setExpirationDate(oldValue);
-                RemindStorage.getInstance().delete(oldReminder);
+                System.out.println(RemindStorage.getInstance().delete(oldReminder));
             }
             if(remindDate.getValue().isAfter(current.minusDays(1))){
                 reminder.setExpirationDate(newValue);
+                RemindStorage.getInstance().reminds.put(reminder.getId(), reminder);
                 save(reminder);
                 drawList();
             }
@@ -101,6 +105,7 @@ public class RemindPageController extends PageController {
                     RemindStorage.getInstance().delete(oldReminder);
                 }
                 reminder.setExpirationTime(LocalTime.parse(newValue, DateTimeFormatter.ofPattern("HH:mm")));
+                RemindStorage.getInstance().reminds.put(reminder.getId(), reminder);
                 save(reminder);
                 drawList();
             }
@@ -111,7 +116,7 @@ public class RemindPageController extends PageController {
 
     public void setRemind(Reminder rem) {
         if (rem == null) {
-            this.reminder = new Reminder();
+            this.reminder = new Reminder(++remindStorage.localId);
         } else {
             reminder = rem;
         }
@@ -136,11 +141,18 @@ public class RemindPageController extends PageController {
 
     @Override
     public void del(Reminder rem) {
-        if(rem == reminder){
+        if(rem.getId() == reminder.getId()){
             topicText.clear();
             contentArea.clear();
             remindDate.setValue(LocalDate.now().plusDays(1));
             remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        }
+        if(PageController.getUserId() != -1){
+            try {
+                DBManager.deleteReminderForUser(PageController.getUserId(),  reminder);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         remindStorage.delete(rem);
         remindsList.getItems().remove(rem);
@@ -177,7 +189,5 @@ public class RemindPageController extends PageController {
         contentArea.setWrapText(true);
         remindDate.setValue(LocalDate.now().plusDays(1));
         remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
-
-
     }
 }

@@ -1,5 +1,6 @@
 package ru.nstu.logbook.controllers;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -12,8 +13,6 @@ import ru.nstu.logbook.notes.Note;
 import ru.nstu.logbook.utils.NoteStorage;
 
 public class NotePageController extends PageController {
-
-
     @FXML
     private TextArea contentArea;
 
@@ -49,12 +48,11 @@ public class NotePageController extends PageController {
     @FXML
     public void delete(ActionEvent event) {
         deleteButton.setDisable(true);
-        System.out.println(NoteStorage.getInstance().delete(note));
+        NoteStorage.getInstance().delete(note);
     }
 
     @FXML
     void initialize() {
-
         contentArea.setWrapText(true);
         topicText.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -70,7 +68,5 @@ public class NotePageController extends PageController {
                 save();
             }
         });
-
-
     }
 }

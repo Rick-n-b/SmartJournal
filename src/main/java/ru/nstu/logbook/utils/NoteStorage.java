@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Properties;
 
 public class NoteStorage {
-    public Map<LocalDate, Note> notes;
+    public final Map<LocalDate, Note> notes;
     private final static String OPTIONS_DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/Options.ini";
     private final static String DEFAULT_PATH = "./src/main/resources/ru/nstu/logbook/";
     private final static String NOTE_DIRECTORY = "notes";
@@ -142,6 +142,13 @@ public class NoteStorage {
 
         if (!noteFile.exists()) {
             try {
+                if(PageController.getUserId() != -1){
+                    try {
+                        DBManager.addNoteForUser(PageController.getUserId(), note);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 noteFile.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -154,19 +161,13 @@ public class NoteStorage {
             throw new RuntimeException(e);
         }
 
-        if(PageController.getUserId() != -1){
-            try {
-                DBManager.deleteNoteForUser(PageController.getUserId(), note.getDate());
-                DBManager.addNoteForUser(PageController.getUserId(), note);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     public void saveAll(){
-        for(var note : notes.values()){
-            save(note);
+        synchronized (notes){
+            for(var note : notes.values()){
+                save(note);
+            }
         }
     }
 
@@ -196,8 +197,6 @@ public class NoteStorage {
             if (options.exists()) {
                 properties.load(Files.newInputStream(options.toPath()));
                 this.path = properties.getProperty("saveDirectoryPath");
-            } else {
-                options.createNewFile();
             }
         } catch (IOException e) {
             System.err.println(": " + e.getMessage());

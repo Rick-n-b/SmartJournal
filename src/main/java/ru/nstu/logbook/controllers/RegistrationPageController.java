@@ -58,13 +58,21 @@ public class RegistrationPageController {
                     mainController.authorizedName.setText(nick.getText());
                     messageLabel.setVisible(true);
                     messageLabel.setText("User registered successfully");
-                    for(var note : NoteStorage.getInstance().notes.values()){
-                        DBManager.addNoteForUser(PageController.getUserId(), note);
+                    synchronized (NoteStorage.getInstance().notes){
+                        for(var note : NoteStorage.getInstance().notes.values()){
+                            DBManager.addNoteForUser(PageController.getUserId(), note);
+                        }
                     }
-                    for(var remind : RemindStorage.getInstance().reminds){
-                        DBManager.addReminderForUser(PageController.getUserId(), remind);
+
+                    synchronized (RemindStorage.getInstance().reminds){
+                        for(var remind : RemindStorage.getInstance().reminds.values()){
+                            DBManager.addReminderForUser(PageController.getUserId(), remind);
+                        }
                     }
+
                     DBManager.addPlanForUser(PageController.getUserId(), plan);
+
+                    mainController.pushButton.setVisible(true);
 
                 }
             } catch (SQLException e) {

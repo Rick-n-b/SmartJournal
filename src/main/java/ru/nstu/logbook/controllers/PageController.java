@@ -25,6 +25,8 @@ import ru.nstu.logbook.utils.RemindStorage;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PageController {
 
@@ -149,7 +151,7 @@ public class PageController {
 
     public void save(Reminder reminder) {
         RemindStorage.getInstance().save(reminder);
-        RemindStorage.getInstance().reminds.add(reminder);
+        RemindStorage.getInstance().reminds.put(reminder.getId(), reminder);
         deleteButton.setDisable(false);
     }
 
@@ -171,10 +173,18 @@ public class PageController {
     }
 
     public void drawList() {
-        remindsList.getItems().clear();
         RemindStorage.getInstance().loadMonth(current);
+
+        //remindsList.getItems().clear();
+        ArrayList<Reminder> reminderList = new ArrayList<>(RemindStorage.getInstance().reminds.values());
+        System.out.println("++++++++");
+        for(var v : reminderList){
+            System.out.println(v.toString());
+        }
+        System.out.println("---------");
+
         ObservableList<Reminder> observableList = FXCollections.observableList(
-            RemindStorage.getInstance().reminds
+                reminderList
         );
         remindsList.setItems(observableList);
     }
@@ -204,9 +214,7 @@ public class PageController {
                         public void handle(MouseEvent event) {
                             if(event.getButton().equals(MouseButton.PRIMARY)){
                                 if(event.getClickCount() == 2){
-                                    if(getItem()!= null){
-                                        showReminder(reminder);
-                                    }
+                                    showReminder(reminder);
                                 }
                             }
                         }

@@ -7,20 +7,26 @@ import java.time.LocalTime;
 public class Reminder implements Serializable {
     static final long serialVersionUID = 8129437039424566964L;
 
+    int id;
     LocalDate expirationDate;
     LocalTime expirationTime;
     String topic;
     String content;
 
-    public Reminder(LocalDate date, LocalTime time, String topic, String content){
+    public Reminder(int id, LocalDate date, LocalTime time, String topic, String content){
+        this.id = id;
         this.expirationDate = date;
         this.expirationTime = time;
         this.topic = topic;
         this.content = content;
     }
 
+    public Reminder(int id){
+        this(id, LocalDate.now(), LocalTime.now(), "", "");
+    }
+
     public Reminder(){
-        this(LocalDate.now(), LocalTime.now(), "", "");
+        this(-1, LocalDate.now(), LocalTime.now(), "", "");
     }
 
     public void setTopic(String topic) {
@@ -48,9 +54,12 @@ public class Reminder implements Serializable {
     public LocalTime getExpirationTime() {
         return expirationTime;
     }
+    public int getId() {
+        return id;
+    }
 
     @Override
     public String toString(){
-        return topic + " " + expirationTime + " " + expirationDate + "\n" + content;
+        return id + ") " + topic + " " + expirationTime + " " + expirationDate + "\n" + content;
     }
 }

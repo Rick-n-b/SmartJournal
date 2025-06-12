@@ -53,6 +53,9 @@ public class RegistrationPageController {
                     messageLabel.setText("Username already exists");
                 } else {
                     PageController.setUserId(DBManager.registerUser(username, pass));
+                    PageController.setUserName(nick.getText());
+
+                    mainController.authorizedName.setText(nick.getText());
                     messageLabel.setVisible(true);
                     messageLabel.setText("User registered successfully");
                     for(var note : NoteStorage.getInstance().notes.values()){

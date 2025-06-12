@@ -10,6 +10,8 @@ import javafx.scene.control.TextField;
 import ru.nstu.logbook.notes.Reminder;
 import ru.nstu.logbook.utils.RemindStorage;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +30,7 @@ public class RemindPageController extends PageController {
     @FXML
     private TextField topicText;
 
+    private static String oldTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
 
     ChangeListener<String> topicListener = new ChangeListener<String>() {
         @Override
@@ -80,18 +83,24 @@ public class RemindPageController extends PageController {
             }
         }
     };
+
     ChangeListener<String> timeListener = new ChangeListener<String>() {
         @Override
         public void changed(final ObservableValue<? extends String> observable, final String oldValue, final String newValue) {
-            if (remindTime.getText().matches("[0-2][0-4]:[0-5][0-9]$")) {
+
+            if(oldValue.matches("2[0-3]:[0-5][0-9]$") || oldValue.matches("[0-1][0-9]:[0-5][0-9]$")){
+                oldTime = oldValue;
+            }
+
+            if(newValue.matches("2[0-3]:[0-5][0-9]$") || newValue.matches("[0-1][0-9]:[0-5][0-9]$")){
                 deleteButton.setDisable(false);
-                if(oldValue != null) {
+                if(oldTime != null){
                     Reminder oldReminder = reminder;
-                    var time = LocalTime.parse(oldValue);
-                    oldReminder.setExpirationTime(time);
+                    var timeToDelete = LocalTime.parse(oldTime, DateTimeFormatter.ofPattern("HH:mm"));
+                    oldReminder.setExpirationTime(timeToDelete);
                     RemindStorage.getInstance().delete(oldReminder);
                 }
-                reminder.setExpirationTime(LocalTime.parse(newValue));
+                reminder.setExpirationTime(LocalTime.parse(newValue, DateTimeFormatter.ofPattern("HH:mm")));
                 save(reminder);
                 drawList();
             }
@@ -135,6 +144,7 @@ public class RemindPageController extends PageController {
         }
         remindStorage.delete(rem);
         remindsList.getItems().remove(rem);
+        drawList();
     }
 
     @FXML
@@ -163,7 +173,7 @@ public class RemindPageController extends PageController {
 
     @FXML
     void initialize() {
-
+        remindTime.setPrefColumnCount(5);
         contentArea.setWrapText(true);
         remindDate.setValue(LocalDate.now().plusDays(1));
         remindTime.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));

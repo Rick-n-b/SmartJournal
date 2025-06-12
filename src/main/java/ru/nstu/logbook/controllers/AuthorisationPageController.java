@@ -44,6 +44,8 @@ public class AuthorisationPageController {
             int userId = DBManager.authenticateUser(username, pass);
             if (userId != -1) {
                 PageController.setUserId(userId);
+                PageController.setUserName(nick.getText());
+                mainController.authorizedName.setText(nick.getText());
                 messageLabel.setVisible(true);
                 messageLabel.setText("Authorized successfully");
                 stage.setScene(askScene);

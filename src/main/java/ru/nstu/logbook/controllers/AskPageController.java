@@ -1,5 +1,6 @@
 package ru.nstu.logbook.controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -51,6 +52,14 @@ public class AskPageController {
         }
         mainController.drawCalendar();
         mainController.drawList();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (mainController.updateThread){
+                    mainController.updateThread.notify();
+                }
+            }
+        });
         stage.close();
     }
 
@@ -65,8 +74,15 @@ public class AskPageController {
 
             RemindStorage.getInstance().reminds.addAll(DBManager.getRemindsForUser(PageController.getUserId()));
             RemindStorage.getInstance().saveAll();
-            System.out.println(PageController.getUserId() + RemindStorage.getInstance().reminds.getLast().toString());
             PageController.plan = DBManager.getPlanForUser(PageController.getUserId());
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (mainController.updateThread){
+                        mainController.updateThread.notify();
+                    }
+                }
+            });
 
             mainController.drawCalendar();
             mainController.drawList();
@@ -79,6 +95,8 @@ public class AskPageController {
     @FXML
     public void cancel(ActionEvent event){
         PageController.setUserId(-1);
+        PageController.setUserName("Unreg");
+        mainController.authorizedName.setText("Unreg");
         stage.setScene(authPageScene);
     }
 
@@ -96,5 +114,7 @@ public class AskPageController {
         stage.setScene(authPageScene);
         stage.setResizable(false);
         stage.setTitle("Authorization");
+
+        stage.setOnCloseRequest(e -> cancel(new ActionEvent()));
     }
 }

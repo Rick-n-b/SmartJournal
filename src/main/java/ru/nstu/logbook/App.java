@@ -123,6 +123,7 @@ public class App extends Application {
         stage.setOnCloseRequest(e-> {
                 NoteStorage.getInstance().saveConf();
                 RemindStorage.getInstance().saveConf();
+                mainController.updateThread.interrupt();
                 Platform.exit();
                 System.exit(0);
                 DBManager.closeConnection();

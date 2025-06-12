@@ -50,7 +50,7 @@
                  <Font size="14.0" />
               </font>
            </Button>
-           <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" onMouseClicked="#remindsListEvent" prefHeight="249.0" prefWidth="178.0" />
+           <ListView fx:id="remindsList" layoutX="13.0" layoutY="300.0" prefHeight="249.0" prefWidth="178.0" />
            <Button fx:id="backButton" layoutX="13.0" layoutY="557.0" mnemonicParsing="false" onAction="#back" text="Back" >
               <font>
                  <Font size="14.0" />

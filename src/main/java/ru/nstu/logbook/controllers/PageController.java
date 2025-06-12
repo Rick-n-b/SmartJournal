@@ -1,5 +1,9 @@
 package ru.nstu.logbook.controllers;
 
+import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -11,12 +15,14 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import ru.nstu.logbook.net.DBManager;
 import ru.nstu.logbook.net.User;
 import ru.nstu.logbook.notes.Note;
 import ru.nstu.logbook.notes.Reminder;
 import ru.nstu.logbook.utils.NoteStorage;
 import ru.nstu.logbook.utils.RemindStorage;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -81,7 +87,9 @@ public class PageController {
     public Scene regPageScene;
     public RegistrationPageController registrationPageController;
 
-    private static User user;
+
+
+    private static final User user = new User();
 
     public static String plan = "";
 
@@ -90,16 +98,12 @@ public class PageController {
     }
 
     public static void setUserId(int userId){
-        user.id = userId;
+        if(userId != -1)
+            user.id = userId;
     }
 
     public static void setUserName(String name){
         user.name = name;
-    }
-
-    @FXML
-    public void remindsListEvent(MouseEvent event) {
-
     }
 
     @FXML
@@ -271,6 +275,8 @@ public class PageController {
         if(this != mainPageController){
             scrollDateTo.valueProperty().bindBidirectional(mainPageController.scrollDateTo.valueProperty());
             scrollDateSince.valueProperty().bindBidirectional(mainPageController.scrollDateSince.valueProperty());
+
+            authorizedName.textProperty().bind(mainPageController.authorizedName.textProperty());
         }
 
         if(this != remindPageController){
@@ -291,10 +297,6 @@ public class PageController {
             }
         });
 
-        authorizedName.textProperty().addListener(e -> {
-            authorizedName.textProperty().setValue(user.name);
-        });
-
         listAdd.setOnAction(e -> {
             showReminder(null);
         });
@@ -302,6 +304,7 @@ public class PageController {
         listCM.getItems().get(2).setDisable(true);
         listCM.getItems().get(1).setDisable(true);
         remindsList.setContextMenu(listCM);
+
         drawList();
     }
 }

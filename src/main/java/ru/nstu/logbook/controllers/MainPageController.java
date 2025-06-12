@@ -1,14 +1,19 @@
 package ru.nstu.logbook.controllers;
 
+import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.TextAlignment;
+import ru.nstu.logbook.net.DBManager;
+import ru.nstu.logbook.utils.NoteStorage;
+import ru.nstu.logbook.utils.RemindStorage;
 
 public class MainPageController extends PageController {
 
@@ -47,6 +52,43 @@ public class MainPageController extends PageController {
     void goToDate(ActionEvent event) {
         calendarDate = datePicker.valueProperty().getValue();
         drawCalendar();
+    }
+
+    public final Thread updateThread = new Thread(this::update);
+
+    public void update() {
+        try {
+            while (true) {
+                if (PageController.getUserId() == -1) {
+                            synchronized (updateThread) {
+                                try {
+                                    updateThread.wait();
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                } else {
+                    NoteStorage.getInstance().notes.putAll(DBManager.getNotesForUser(PageController.getUserId()));
+                    NoteStorage.getInstance().saveAll();
+
+                    RemindStorage.getInstance().reminds.addAll(DBManager.getRemindsForUser(PageController.getUserId()));
+                    RemindStorage.getInstance().saveAll();
+                    PageController.plan = DBManager.getPlanForUser(PageController.getUserId());
+                    drawList();
+                    drawCalendar();
+
+                    synchronized (updateThread) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void drawCalendar() {
@@ -104,5 +146,6 @@ public class MainPageController extends PageController {
         drawCalendar();
         noteStorage.loadConf();
         remindStorage.loadConf();
+        updateThread.start();
     }
 }
